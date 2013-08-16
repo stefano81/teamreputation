@@ -9,6 +9,12 @@ int main(int argc, char* argv[]) {
 
   // load data
   graph g{userfile, edgefile};
+  g.stats();
+
+
+  for (int i = 0; i < 10; ++i) {
+    user u = g.get_topuser({"c"+i});
+  }
 
   // find all
   //auto names = get(boost::vertex_name, g);
