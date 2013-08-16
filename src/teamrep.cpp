@@ -1,25 +1,20 @@
-#include <future>
-#include <iostream>
-#include <fstream>
 #include <string>
-#include <utility>
-#include <algorithm>
-#include <map>
 
+#include "graph.hpp"
 
 int main(int argc, char* argv[]) {
-  std::string filename{argv[1]};
+  std::string userfile{argv[1]}, edgefile{argv[2]};
 
-  std::map<std::string, Vertex> users;
+  //  std::map<std::string, Vertex> users;
 
   // load data
-  graph g{filename};
+  graph g{userfile, edgefile};
 
   // find all
-  auto names = get(boost::vertex_name, g);
+  //auto names = get(boost::vertex_name, g);
   //  std::vector<std::future<void>> threads;
   //  int i = 0;
-   for (auto it = vertices(g); it.first != it.second; ++it.first) {
+  //   for (auto it = vertices(g); it.first != it.second; ++it.first) {
 //     /*threads.push_back(std::async(//[](int id, std::string name){
 // 	  //std::cerr << i << " " << names[*(it.first)] << std::endl;
 // 	  function
@@ -27,7 +22,7 @@ int main(int argc, char* argv[]) {
 // 	    //}
 // 	    , i, names[*(it.first)]));*/
 //     threads.push_back(std::async([]{std::cerr << "TEST\n";}));
-   }
+//   }
 
 //   auto f = std::async(called_from_async);
 //   f.get();

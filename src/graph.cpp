@@ -1,22 +1,40 @@
 #include "graph.hpp"
 
 #include <iostream>
-#include <utils>
+//#include <util>
 
 #include <boost/tokenizer.hpp>
-
 #include <boost/graph/breadth_first_search.hpp>
 
-void graph::stats() {
-  std::cerr << "Vertex count : " << num_vertices(g) << std::endl;
-  std::cerr << "Edge count : " << num_edges(g) << std::endl;
+/* void graph::stats() {
+   std::cerr << "Vertex count : " << num_vertices(this->g) << std::endl;
+   std::cerr << "Edge count : " << num_edges(this->g) << std::endl;
+   }*/
+
+void load_dot(const std::string &userfilepath, const std::string &edgefilepath) {
+  std::ifstream userfile{userfilepath}, edgefile{edgefilepath};
+
+  auto user_name = get(boost::vertex_name, this->g);
+  auto reputation_argument = get(boost::edge_name, g);
+  auto reputation_value = get(boost::edge_weight, g);
+
+  // add users
+  std::string line;
+
+  boost::char_separator<char> comma_sep{","};
+  while (std::getline(userfile, line)) {
+    std::cerr << line << std::endl;
+
+    boost::tokenizer<boost::char_separator<char> > tokenizer{line, comma_sep};
+
+    //auto token = begin(tonekizer);
+  }
+  
+  // add edges
+  //boost::char_separator<char> eq_sep{"="};
 }
 
-void graph::load_dot(const std::string &filename) {
-  auto 
-}
-
-void graph::load_csv(const std::string &filename) {
+/*void graph::load_csv(const std::string &filename) {
   /*  std::map<std::string, Vertex> users;
   std::ifstream file(filename);
 

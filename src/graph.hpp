@@ -8,30 +8,28 @@
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/visitors.hpp>
 
-
-#include "user"
+#include "user.hpp"
 
 typedef boost::property<boost::vertex_name_t, std::string> VertexProperty;
-typedef boost::property<boost::edge_name_t, std::string, boost::property<boost::edge_weight_t, float>> EdgeProperty;
-typedef boost::adjacency_list<boost::setS, boost::listS, boost::undirectedS, VertexProperty, EdgeProperty> graph_t;
+typedef boost::property<boost::edge_name_t, std::string>/*, boost::property<boost::edge_weight_t, float>>*/ EdgeProperty;
+typedef boost::adjacency_list<boost::setS, boost::listS, boost::undirectedS, VertexProperty, EdgeProperty> Graph;
 typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
 
 class graph {
 public:
-  graph(const std::string &filename, const std::string &type = "dot") {
+  graph(const std::string &userfile, const std::string &edgefile, const std::string &type = "dot") {
     if (0 == type.compare("dot"))
-      load_dot(filename);
-    if (0 == type.compare("csv"))
-      load_csv(filename);
+      load_dot(userfile, edgefile);
   };
   
-  void stats();
+  //  void stats();
     
 private:
+
   std::map<user, Vertex> users;
 
-  graph_t g;
+  Graph g;
 
-  void load(const std::string &filename);
+  void load_dot(const std::string &userfile, const std::string &edgefile);
 
-  };
+};
