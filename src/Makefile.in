@@ -90,7 +90,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_teamrep_OBJECTS = teamrep.$(OBJEXT) graph.$(OBJEXT) user.$(OBJEXT)
+am_teamrep_OBJECTS = user.$(OBJEXT) graph.$(OBJEXT) teamrep.$(OBJEXT)
 teamrep_OBJECTS = $(am_teamrep_OBJECTS)
 teamrep_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -248,7 +248,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-teamrep_SOURCES = teamrep.cpp graph.cpp graph.hpp user.cpp user.hpp
+teamrep_SOURCES = config.hpp user.hpp user.cpp graph.cpp graph.hpp	\
+		  teamrep.cpp
+
 all: config.hpp
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

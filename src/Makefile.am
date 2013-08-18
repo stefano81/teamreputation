@@ -5,4 +5,5 @@ LDFLAGS =
 # this lists the binaries to produce, the (non-PHONY, binary) targets in
 # the previous manual Makefile
 bin_PROGRAMS = teamrep
-teamrep_SOURCES = teamrep.cpp graph.cpp graph.hpp user.cpp user.hpp
+teamrep_SOURCES = config.hpp user.hpp user.cpp graph.cpp graph.hpp	\
+		  teamrep.cpp

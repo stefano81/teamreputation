@@ -1,6 +1,51 @@
+#include <set>
 #include <string>
+#include <random>
+#include <unordered_set>
 
 #include "graph.hpp"
+
+const unsigned taskSkills{5};
+const unsigned skilln{10};
+
+std::set<unsigned> get_compset(const unsigned avoid, const unsigned setsize) {
+  std::set<unsigned> set;
+  for (unsigned i = 0; i < setsize; ++i) {
+    
+  }
+
+  return set;
+}
+
+void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned iteration) {
+  std::cerr << iteration << " up to " << search_level <<  std::endl;
+  std::unordered_set<unsigned> all_comp;
+  std::map<unsigned, user> top_users;
+
+  for (int i = 0; i < 10; ++i) {
+    all_comp.insert(i);
+    user u = g.topuser(i);
+
+    std::cout << "c" << i << " => " << u.get_name() << std::endl;
+
+    top_users[i] = u;
+  }
+
+  //std::cout << "teamNumber, teamRep, best_max,  best_avg,only_best" << std::endl;
+
+  for (auto i = 0; i < iteration; ++i) {
+   user suser = g.random_user();
+   unsigned scomp = suser.get_best_competence();
+
+   std::cout << i << " - " << suser.get_name() << " with c" << scomp << std::endl;
+
+   std::set<unsigned> compset = get_compset(scomp, taskSkills);
+
+    
+  }
+}
+
+
 
 int main(int argc, char* argv[]) {
   std::string userfile{argv[1]}, edgefile{argv[2]};
@@ -11,10 +56,7 @@ int main(int argc, char* argv[]) {
   graph g{userfile, edgefile};
   g.stats();
 
-
-  for (int i = 0; i < 10; ++i) {
-    user u = g.get_topuser({"c"+i});
-  }
+  testUserCentricCSV(g, std::stoi(argv[3]), 1000);
 
   // find all
   //auto names = get(boost::vertex_name, g);
