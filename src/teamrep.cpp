@@ -5,13 +5,21 @@
 
 #include "graph.hpp"
 
-const unsigned taskSkills{5};
-const unsigned skilln{10};
+constexpr unsigned taskSkills{5};
+constexpr unsigned skilln{10};
+constexpr unsigned seed{1234567890};
 
 std::set<unsigned> get_compset(const unsigned avoid, const unsigned setsize) {
   std::set<unsigned> set;
-  for (unsigned i = 0; i < setsize; ++i) {
-    
+  std::default_random_engine generator{seed};
+  std::uniform_int_distribution<unsigned> competences{0, skilln};
+
+  while (set.size() < setsize) {
+    unsigned x = competences(generator);
+    if (avoid != x) {
+      set.insert(x);
+      std::cerr << x << ' ' << set.size() << std::endl;
+    }
   }
 
   return set;
@@ -39,12 +47,13 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
 
    std::cout << i << " - " << suser.get_name() << " with c" << scomp << std::endl;
 
-   std::set<unsigned> compset = get_compset(scomp, taskSkills);
+   std::set<unsigned> taskcomp = get_compset(scomp, taskSkills-1);
 
-    
+   team suggteam = g.find_team(suser, scomp, taskcomp, search_level);
+
+   taskcomp.insert(scomp);
   }
 }
-
 
 
 int main(int argc, char* argv[]) {
@@ -56,7 +65,7 @@ int main(int argc, char* argv[]) {
   graph g{userfile, edgefile};
   g.stats();
 
-  testUserCentricCSV(g, std::stoi(argv[3]), 1000);
+  testUserCentricCSV(g, std::stoi(argv[3]), 1);
 
   // find all
   //auto names = get(boost::vertex_name, g);

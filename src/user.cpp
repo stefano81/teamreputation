@@ -4,19 +4,30 @@
 #include <iostream>
 #include <sstream>
 
-//void user::add_competence(const std::string &name, const float &value) noexcept {
 void user::add_competence(const unsigned &name, const float &value) noexcept {
   //  std::cerr << name << "=" << value << std::endl;
   this->competences[name] = value;
 }
 
-//float user::get_competence(const std::string &name) const {
 float user::get_competence(const unsigned &name) const {
   auto it = this->competences.find(name);
   if (end(this->competences) == it)
     return 0.0;
   else
     return std::get<1>(*it);
+}
+
+bool user::has(const unsigned &name) const {
+  return end(competences) != competences.find(name);
+}
+
+std::vector<unsigned> user::get_competences() const {
+  std::vector<unsigned> v;
+
+  for (auto it = begin(competences); end(competences) != it; ++it)
+    v.push_back(std::get<0>(*it));
+
+  return v;
 }
 
 std::string user::print_competences() const {

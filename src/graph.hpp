@@ -2,6 +2,7 @@
 
 #include <map>
 #include <random>
+#include <set>
 #include <string>
 #include <utility>
 
@@ -10,6 +11,7 @@
 #include <boost/random/mersenne_twister.hpp>
 
 #include "user.hpp"
+#include "team.hpp"
 
 typedef boost::property<boost::vertex_name_t, std::string> VertexProperty;
 typedef boost::property<boost::edge_name_t, unsigned, boost::property<boost::edge_weight_t, float> > EdgeProperty;
@@ -26,6 +28,10 @@ public:
 
   user topuser(const unsigned &compentece) const;
   user random_user();
+  team find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level);
+  team compute_top_users(const std::map<unsigned, user> &top_users, const std::set<unsigned> &competeces);
+  void compute_reputation(team &t);
+
 private:
   // private fields
   const unsigned seed{1234567};
@@ -38,4 +44,6 @@ private:
   // private methods
   void load_dot(const std::string &userfile, const std::string &edgefile);
   user get_user(const Vertex &v);
+  Vertex get_vertex(const user &u);
+  std::set<Vertex> possible_users(const user &suser, const unsigned &search_level);
 };

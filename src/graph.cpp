@@ -13,6 +13,8 @@
 
 #include <boost/tokenizer.hpp>
 
+#include "teamgenerator.hpp"
+
 graph::graph(const std::string &userfile, const std::string &edgefile, const std::string &type) : random{seed} {
     if (0 == type.compare("dot"))
       this->load_dot(userfile, edgefile);
@@ -123,7 +125,87 @@ user graph::get_user(const Vertex &v) {
   return up.first;
 }
 
+Vertex graph::get_vertex(const user &u) {
+  return users[u.get_name()].second;
+}
+
 user graph::random_user() {
   Vertex v = random_vertex(this->g, random);
   return get_user(v);
+}
+
+void graph::compute_reputation(team &t) {
+  // get vertexes
+  float reputation = 0.0;
+  int num = 0;
+  
+  for (auto it = t.begin(); it != t.end(); ++it) {
+    for (auto it2 = t.begin(); it2 != t.end(); ++it2) {
+      if (*it2 == *it) {
+	auto u = std::get<1>(*it);
+	auto v = std::get<1>(*it2);
+	std::cerr << "computing reputation between ";
+	std::cerr << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << std::endl;
+      } else {
+	std::cerr << "skipping ";// << std::get<1>(*it).get_name() << " and " << std::get<1>(*it2).get_name() << std::endl;
+      }
+    }
+  }
+
+}
+
+
+team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) {
+  auto users = possible_users(suser, search_level);
+  teamgenerator tg;
+
+  for (auto v : users)
+    for (auto c : taskcomp) {
+      auto u = get_user(v);
+      if (u.has(c))
+	tg.add(c, u);
+    }
+
+  std::vector<team> teams;
+  while (tg.has_next()) {
+    team t = tg.next();
+    std::cerr << "computing reputation for team" << std::endl;
+    compute_reputation(t);
+
+    teams.push_back(t);
+  }
+
+  if (begin(teams) != end(teams)) {
+    sort(begin(teams), end(teams), [](const team &t1, const team &t2) -> bool { return t1.reputation() > t2.reputation();});
+   
+    return *begin(teams);
+  } else {
+    return {};
+  }
+}
+
+std::set<Vertex> graph::possible_users(const user &suser, const unsigned &search_level) {
+  std::set<Vertex> candidates;
+  std::vector<std::pair<Vertex, unsigned>> to_process;
+
+  auto t = get_vertex(suser);
+  to_process.push_back({t, 0});
+
+  while (!to_process.empty()) {
+    auto u = to_process[0];
+    to_process.erase(begin(to_process));
+
+    unsigned n = ++(std::get<1>(u));
+    if (search_level > n) {
+      for (auto eit = out_edges(std::get<0>(u), this->g); eit.first != eit.second; (eit.first)++) {
+	auto v = target(*eit.first, this->g);
+
+	if (std::get<1>(candidates.insert(v))) {
+	  to_process.push_back({std::move(v), n});
+	}
+      }
+    }
+  }
+
+  return std::move(candidates);
 }
