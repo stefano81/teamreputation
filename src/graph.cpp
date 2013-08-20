@@ -145,15 +145,18 @@ void graph::compute_reputation(team &t) {
 	auto u = std::get<1>(*it);
 	auto v = std::get<1>(*it2);
 	std::cerr << "computing reputation between ";
-	std::cerr << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << std::endl;
+	std::cerr << u.get_name();
+	std::cerr << " and ";
+	std::cerr << v.get_name();
+	std::cerr << " for ";
+	std::cerr << std::get<0>(*it2);
+	std::cerr << std::endl;
       } else {
-	std::cerr << "skipping ";// << std::get<1>(*it).get_name() << " and " << std::get<1>(*it2).get_name() << std::endl;
+	std::cerr << "skipping ";
       }
     }
   }
-
 }
-
 
 team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) {
   auto users = possible_users(suser, search_level);
