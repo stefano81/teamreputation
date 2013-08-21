@@ -9,6 +9,11 @@ void user::add_competence(const unsigned &name, const float &value) noexcept {
   this->competences[name] = value;
 }
 
+bool user::operator==(const user&other) const {
+  return other.id == id; // && other.competences == competences;
+};
+
+
 float user::get_competence(const unsigned &name) const {
   auto it = this->competences.find(name);
   if (end(this->competences) == it)

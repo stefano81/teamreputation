@@ -1,3 +1,4 @@
+#include <limits>
 #include <set>
 #include <string>
 #include <random>
@@ -45,13 +46,34 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
    user suser = g.random_user();
    unsigned scomp = suser.get_best_competence();
 
-   std::cout << i << " - " << suser.get_name() << " with c" << scomp << std::endl;
-
    std::set<unsigned> taskcomp = get_compset(scomp, taskSkills-1);
 
    try {
-     team suggteam = g.find_team(suser, scomp, taskcomp, search_level);
+     team steam = g.find_team(suser, scomp, taskcomp, search_level);
 
+     std::cout << steam.size() << ',' << steam.reputation() << ',';
+
+     double wtur = std::numeric_limits<double>::min(),
+       wtut = 0.0;
+
+     team otu;
+     for (auto uc : steam.get_members()) {
+       if (std::get<1>(uc) == suser)
+	 continue;
+
+       user bc = top_users[std::get<0>(uc)];
+       team tt{steam};
+       tt.add(bc, std::get<0>(uc));
+       otu.add(bc, std::get<0>(uc));
+       
+       double tr = g.compute_reputation(tt);
+
+       wtut +=tr;
+
+       wtur = std::max(wtur, tr);
+     }
+
+     std::cout << wtur << ',' << (wtur / steam.size()) << ',' << g.compute_reputation(otu) << std::endl;
    } catch (int v) {
      std::cerr << "skipping iteration " << i << " because no friends" << std::endl;
    }

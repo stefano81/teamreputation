@@ -31,7 +31,7 @@ public:
   user random_user();
   team find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level);
   team compute_top_users(const std::map<unsigned, user> &top_users, const std::set<unsigned> &competeces);
-  void compute_reputation(team &t);
+  double compute_reputation(const team &t);
 
 private:
   // private fields

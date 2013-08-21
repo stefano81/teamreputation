@@ -33,7 +33,7 @@ public:
   void reputation(const double& rep) { r = rep; is_computed = true;}
   unsigned size() const;
 
-  std::map<unsigned, user> get_members() {return members;};
+  std::map<unsigned, user> get_members() const;
 
   iterator begin() { return iterator(*this); };
   iterator end() {return iterator(*this, true); };

@@ -1,4 +1,6 @@
 #include "team.hpp"
+
+//#include <algorithm>
 #include <iostream>
 #include <exception>
 
@@ -16,6 +18,10 @@ std::set<unsigned> team::competences() {
     comps.insert(std::get<0>(m));
 
   return comps;
+}
+
+std::map<unsigned, user> team::get_members() const {
+  return members;
 }
 
 unsigned team::size() const {

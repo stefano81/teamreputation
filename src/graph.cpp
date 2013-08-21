@@ -197,7 +197,7 @@ double graph::my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) con
   return rep;
 }
 
-void graph::compute_reputation(team &t) {
+double graph::compute_reputation(const team &t) {
   // get vertexes
   double reputation = 0.0;
   int num = 0;
@@ -219,7 +219,7 @@ void graph::compute_reputation(team &t) {
     }
   }
 
-  t.reputation(reputation/(t.size() * (t.size() - 1)));
+  return reputation/(t.size() * (t.size() - 1));
 }
 
 team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) {
@@ -243,9 +243,9 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
   while (tg.has_next()) {
     team t = tg.next();
 
-    asyncs.push_back(std::async([&,t]{ // capture everying by reference, t by value or ti will disappear before the execution
+    asyncs.push_back(std::async([&,t]{ // capture everying by reference, t by value or t will "disappear" (go out of scope) before the execution of the functor
     	  team t1{t};
-	  compute_reputation(t1);
+	  t1.reputation(compute_reputation(t1));
 	  std::lock_guard<std::mutex> _m{m}; // unlocked at the exit of the function
 	  teams.push_back(t1);
 	})

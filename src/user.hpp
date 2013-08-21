@@ -19,9 +19,7 @@ public:
   std::string print_competences() const;
   unsigned get_best_competence() const;
 
-  bool operator==(const user&other) const {
-    return other.id == id && other.competences ==competences;
-  };
+  bool operator==(const user&other) const;
   bool operator<(const user&other) const { return id < other.id;};
 private:
   std::string id;
