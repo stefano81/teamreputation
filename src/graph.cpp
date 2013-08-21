@@ -217,7 +217,7 @@ void graph::compute_reputation(team &t) {
     }
   }
 
-  t.reputation(reputation/(t.size() * (t.size() - 1));
+  t.reputation(reputation/(t.size() * (t.size() - 1)));
 }
 
 team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) {
