@@ -49,9 +49,13 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
 
    std::set<unsigned> taskcomp = get_compset(scomp, taskSkills-1);
 
-   team suggteam = g.find_team(suser, scomp, taskcomp, search_level);
-
-   taskcomp.insert(scomp);
+   try {
+     team suggteam = g.find_team(suser, scomp, taskcomp, search_level);
+     return;
+     //taskcomp.insert(scomp);
+   } catch (int v) {
+     std::cerr << "skipping iteration " << i << " because no friends" << std::endl;
+   }
   }
 }
 
@@ -65,7 +69,7 @@ int main(int argc, char* argv[]) {
   graph g{userfile, edgefile};
   g.stats();
 
-  testUserCentricCSV(g, std::stoi(argv[3]), 1);
+  testUserCentricCSV(g, std::stoi(argv[3]), 10);
 
   // find all
   //auto names = get(boost::vertex_name, g);

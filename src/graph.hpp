@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -34,9 +35,9 @@ public:
 
 private:
   // private fields
-  const unsigned seed{1234567};
+  const unsigned seed = 1234567;
+  const unsigned ncomp = 10;
   std::map<std::string, std::pair<user, Vertex> > users;
-  //  std::default_random_engine random;
   boost::random::mt19937 random;
 
   Graph g;
@@ -45,5 +46,8 @@ private:
   void load_dot(const std::string &userfile, const std::string &edgefile);
   user get_user(const Vertex &v);
   Vertex get_vertex(const user &u);
-  std::set<Vertex> possible_users(const user &suser, const unsigned &search_level);
+  std::set<user> possible_users(const user &suser, const unsigned &search_level);
+  double my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const;
+  double distance(const unsigned &c1, const unsigned &c2) const;
+  double similarity(const unsigned &c1, const unsigned &c2) const;
 };

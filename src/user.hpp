@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <ostream>
+#include <utility>
 #include <vector>
 
 class user {
@@ -21,9 +22,11 @@ public:
   bool operator==(const user&other) const {
     return other.id == id && other.competences ==competences;
   };
+  bool operator<(const user&other) const { return id < other.id;};
 private:
   std::string id;
   std::map<unsigned, float> competences;
 };
 
+using namespace std::rel_ops;
 

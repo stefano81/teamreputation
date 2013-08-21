@@ -1,8 +1,12 @@
 #include "graph.hpp"
 
+#include <algorithm>
 #include <exception>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <limits>
+#include <queue>
+
 
 #include <boost/format.hpp>
 
@@ -16,8 +20,8 @@
 #include "teamgenerator.hpp"
 
 graph::graph(const std::string &userfile, const std::string &edgefile, const std::string &type) : random{seed} {
-    if (0 == type.compare("dot"))
-      this->load_dot(userfile, edgefile);
+  if (0 == type.compare("dot"))
+    this->load_dot(userfile, edgefile);
 }
 
 void graph::stats() {
@@ -36,8 +40,6 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
 
   boost::char_separator<char> comma_sep{","};
   while (std::getline(userfile, line)) {
-    std::cerr << line << std::endl;
-
     boost::tokenizer<boost::char_separator<char> > tokenizer{line, comma_sep};
 
     auto token = begin(tokenizer);
@@ -55,12 +57,6 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
     user_name[u] = uo.get_name();
     this->users[uo.get_name()] = std::make_pair(uo, u);
   }
-
-  /*  std::cerr << "#print vertices" << std::endl;
-  for (auto vl = vertices(this->g); vl.first != vl.second; ++vl.first) {
-    std::cerr << "#" << user_name[*(vl.first)] << '['
-	      << std::get<0>(this->users[user_name[*(vl.first)]]).print_competences() << ']' << std::endl;
-	      }*/
 
   // add edges
   boost::char_separator<char> eq_sep{"="};
@@ -81,7 +77,6 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
     unsigned int cid =  std::stoi((*etoit).substr(1));
     float ev = std::stof(*(++etoit));
     
-    //std::cerr << user_name[u] << ' ' << user_name[v] << std::endl;
     auto e = add_edge(u, v, this->g);
     if (e.second) {
       reputation_argument[e.first] = cid;
@@ -91,14 +86,6 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
       throw std::exception{};
     }
   }
-  /*
-  // print edges
-  std::cerr << "#print edges" << std::endl;
-  for (auto el = edges(this->g); el.first != el.second; ++el.first) {
-    auto e = *(el.first);
-    std::cerr << "#" << user_name[source(e, this->g)] << " - (" << reputation_argument[e] << "=" << reputation_value[e] << ") - " << user_name[target(e, this->g)] << std::endl;
-  }
-  */
 }
 
 user graph::topuser(const unsigned &competence) const {
@@ -134,49 +121,137 @@ user graph::random_user() {
   return get_user(v);
 }
 
+double graph::similarity(const unsigned &c1, const unsigned &c2) const {
+  return 1 - distance(c1, c2);
+}
+
+double graph::distance(const unsigned &c1, const unsigned &c2) const {
+  unsigned p1{c1};
+  unsigned p2{c2};
+
+  unsigned distance;
+
+  while (p1 != p2) {
+    if (p1 > p2)
+      p1 = (p1 - 1) / 2;
+    else
+      p2 = (p2 - 1) / 2;
+    ++distance;
+  }
+
+  return distance / (double) ncomp;
+}
+
+
+double graph::my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const {
+  std::queue<Vertex> tovisit;
+  std::set<Vertex> visited;
+  double rep;
+  std::map<Vertex, double> reps;
+  std::map<Vertex, double> min_w;
+
+  rep = std::numeric_limits<double>::min();
+  reps[u] = std::numeric_limits<double>::min();
+  min_w[v] = std::numeric_limits<double>::max();
+
+  tovisit.push(u);
+
+  auto reputation_argument = get(boost::edge_name, g);
+  auto reputation_value = get(boost::edge_weight, g);
+
+  while (!tovisit.empty()) {
+    bool inserted = false;
+
+    Vertex i = tovisit.front();
+    tovisit.pop();
+
+    for (auto e = out_edges(i, this->g); e.first != e.second; ++(e.first)) {
+      auto j = target(*e.first, this->g);
+
+      if (j == u)
+	continue; // cicle with source
+
+      auto re = reputation_value[*e.first];
+      auto l = similarity(comp, reputation_argument[*e.first]);
+      if (v != j) {
+	auto w = 1 / ((2 + re) * l);
+
+	if (min_w[j] < w) {
+	  min_w[j] = w;
+	  reps[j] = std::min(reps[j], (re * l));
+	}
+      } else {
+	auto cp = reps[source(*e.first, this->g)];
+	auto cr = std::min(cp, (re * l));
+
+	rep = std::min(rep, cr);
+      }
+    }
+
+    if (!inserted)
+      break;
+  }
+
+  return rep;
+}
+
 void graph::compute_reputation(team &t) {
   // get vertexes
-  float reputation = 0.0;
+  double reputation = 0.0;
   int num = 0;
-  
-  for (auto it = t.begin(); it != t.end(); ++it) {
-    for (auto it2 = t.begin(); it2 != t.end(); ++it2) {
-      if (*it2 == *it) {
+  auto m = t.get_members();
+
+  for (auto it = begin(m); it != end(m); ++it) {
+    for (auto it2 = begin(m); it2 != end(m); ++it2) {
+      if (std::get<1>(*it2) != std::get<1>(*it)) {
 	auto u = std::get<1>(*it);
 	auto v = std::get<1>(*it2);
-	std::cerr << "computing reputation between ";
-	std::cerr << u.get_name();
-	std::cerr << " and ";
-	std::cerr << v.get_name();
-	std::cerr << " for ";
-	std::cerr << std::get<0>(*it2);
-	std::cerr << std::endl;
-      } else {
-	std::cerr << "skipping ";
+	std::cerr << "computing reputation between " << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << std::endl;
+
+	try {
+	  reputation += my_bfs(get_vertex(u), get_vertex(v), std::get<0>(*it2));
+	} catch (int ex) {
+	  std::cerr << "there is no direct path between u and v" << std::endl;
+	}
       }
     }
   }
+
+  t.reputation(reputation/(t.size() * (t.size() - 1));
 }
 
 team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) {
+  std::cerr << "find teams" << std::endl;
+
   auto users = possible_users(suser, search_level);
+
+  if (0 == users.size()) throw 0;
+
   teamgenerator tg;
 
-  for (auto v : users)
+  for (auto u : users)
     for (auto c : taskcomp) {
-      auto u = get_user(v);
+      //auto u = get_user(v);
       if (u.has(c))
 	tg.add(c, u);
     }
 
+  tg.print();
+
   std::vector<team> teams;
+
+  int i = 0; 
   while (tg.has_next()) {
     team t = tg.next();
+    t.print();
+
     std::cerr << "computing reputation for team" << std::endl;
     compute_reputation(t);
-
+    
     teams.push_back(t);
   }
+
+  return {};
 
   if (begin(teams) != end(teams)) {
     sort(begin(teams), end(teams), [](const team &t1, const team &t2) -> bool { return t1.reputation() > t2.reputation();});
@@ -187,25 +262,41 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
   }
 }
 
-std::set<Vertex> graph::possible_users(const user &suser, const unsigned &search_level) {
-  std::set<Vertex> candidates;
+std::set<user> graph::possible_users(const user &suser, const unsigned &search_level) {
+  std::set<user> candidates;
   std::vector<std::pair<Vertex, unsigned>> to_process;
+
+  std::cerr << "possible_users: starting from " << suser.get_name() << " up to " << search_level << std::endl;
 
   auto t = get_vertex(suser);
   to_process.push_back({t, 0});
 
   while (!to_process.empty()) {
-    auto u = to_process[0];
+    std::pair<Vertex, unsigned> u = to_process[0];
     to_process.erase(begin(to_process));
+
+    std::cerr << "possible_users: to_process.size() == " << to_process.size() << std::endl;
 
     unsigned n = ++(std::get<1>(u));
     if (search_level > n) {
+      std::cerr << "possible users: " << n << std::endl;
+
+      std::cerr << "possible users: friends of " << get_user(std::get<0>(u)).get_name() << std::endl;
+      
       for (auto eit = out_edges(std::get<0>(u), this->g); eit.first != eit.second; (eit.first)++) {
 	auto v = target(*eit.first, this->g);
-
-	if (std::get<1>(candidates.insert(v))) {
+	std::cerr << "possible users: " << get_user(v).get_name() << std::endl;	
+	
+	auto res = candidates.insert(get_user(v));
+	
+	if (res.second) {
+	  std::cerr << "possible users: inserted" << std::endl;
 	  to_process.push_back({std::move(v), n});
+	} else {
+	  std::cerr << "possible users: already known" << std::endl;
 	}
+
+	std::cerr << "possible users: candidates.size() == " << candidates.size() << std::endl;
       }
     }
   }
