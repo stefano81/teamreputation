@@ -3,8 +3,10 @@
 #include <algorithm>
 #include <exception>
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <limits>
+#include <mutex>
 #include <queue>
 
 
@@ -221,8 +223,6 @@ void graph::compute_reputation(team &t) {
 }
 
 team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) {
-  std::cerr << "find teams" << std::endl;
-
   auto users = possible_users(suser, search_level);
 
   if (0 == users.size()) throw 0;
@@ -230,28 +230,30 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
   teamgenerator tg;
 
   for (auto u : users)
-    for (auto c : taskcomp) {
-      //auto u = get_user(v);
+    for (auto c : taskcomp)
       if (u.has(c))
 	tg.add(c, u);
-    }
-
-  tg.print();
 
   std::vector<team> teams;
 
-  int i = 0; 
+  std::vector<std::future<void> > asyncs;
+
+    std::mutex m;
+
   while (tg.has_next()) {
     team t = tg.next();
-    t.print();
 
-    std::cerr << "computing reputation for team" << std::endl;
-    compute_reputation(t);
-    
-    teams.push_back(t);
+    asyncs.push_back(std::async([&,t]{ // capture everying by reference, t by value or ti will disappear before the execution
+    	  team t1{t};
+	  compute_reputation(t1);
+	  std::lock_guard<std::mutex> _m{m}; // unlocked at the exit of the function
+	  teams.push_back(t1);
+	})
+      );
   }
 
-  return {};
+  for (auto f = begin(asyncs); end(asyncs) != f; ++f)
+    f->get();
 
   if (begin(teams) != end(teams)) {
     sort(begin(teams), end(teams), [](const team &t1, const team &t2) -> bool { return t1.reputation() > t2.reputation();});

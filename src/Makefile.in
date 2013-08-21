@@ -174,7 +174,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 
 # what flags you want to pass to the C compiler & linker
-CPPFLAGS = -std=c++11 -ggdb -O0 -Werror
+CPPFLAGS = -std=c++11 -g -O2 -Werror
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
