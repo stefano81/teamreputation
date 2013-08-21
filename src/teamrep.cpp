@@ -74,8 +74,11 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
      }
 
      std::cout << wtur << ',' << (wtur / steam.size()) << ',' << g.compute_reputation(otu) << std::endl;
+
    } catch (int v) {
      std::cerr << "skipping iteration " << i << " because no friends" << std::endl;
+   } catch (std::exception e) {
+     std::cerr << "skipping iteration " << i << " because no team is possible" << std::endl;
    }
   }
 }

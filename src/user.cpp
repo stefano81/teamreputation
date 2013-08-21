@@ -1,6 +1,5 @@
 #include "user.hpp"
 
-#include <exception>
 #include <iostream>
 #include <sstream>
 
@@ -53,7 +52,7 @@ std::string user::print_competences() const {
 
 unsigned user::get_best_competence() const {
   if (0 == competences.size())
-    throw std::exception{};
+    throw "user has no competences";
 
   auto cit = begin(competences);
 
@@ -67,9 +66,3 @@ unsigned user::get_best_competence() const {
   
   return c;
 }
-
-/*
-  std::ostream & user::operator<<(const user &user) {
-    return stream << "user{" << user.id << "}[" << user.competences << "]";
-  }
-*/

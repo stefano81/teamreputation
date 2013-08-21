@@ -2,13 +2,12 @@
 
 //#include <algorithm>
 #include <iostream>
-#include <exception>
 
 double team::reputation() const {
   if (is_computed)
     return r;
   else
-    throw std::exception{};
+    throw -1;
 }
 
 std::set<unsigned> team::competences() {
@@ -26,8 +25,9 @@ std::map<unsigned, user> team::get_members() const {
 
 unsigned team::size() const {
   std::set<user> unique_members;
-
+  std::cerr << "computing size" << std::endl;
   for (auto up : members) {
+    std::cerr << std::get<1>(up).get_name() << std::endl;
     unique_members.insert(std::get<1>(up));
   }
 

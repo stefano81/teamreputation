@@ -1,7 +1,6 @@
 #include "graph.hpp"
 
 #include <algorithm>
-#include <exception>
 #include <fstream>
 #include <future>
 #include <iostream>
@@ -85,7 +84,7 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
       reputation_value[e.first] = ev;
     } else {
       std::cerr << "Error creating edge between " << user_name[u] << " and " << user_name[v] << std::endl;
-      throw std::exception{};
+      throw "Error creating edge between users";
     }
   }
 }
@@ -238,7 +237,7 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
 
   std::vector<std::future<void> > asyncs;
 
-    std::mutex m;
+  std::mutex m;
 
   while (tg.has_next()) {
     team t = tg.next();
@@ -259,9 +258,9 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
     sort(begin(teams), end(teams), [](const team &t1, const team &t2) -> bool { return t1.reputation() > t2.reputation();});
    
     return *begin(teams);
-  } else {
-    return {};
-  }
+  } 
+
+  throw std::exception{};
 }
 
 std::set<user> graph::possible_users(const user &suser, const unsigned &search_level) {
