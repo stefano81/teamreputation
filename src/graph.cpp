@@ -242,7 +242,14 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
   while (tg.has_next()) {
     team t = tg.next();
 
-    asyncs.push_back(std::async([&,t]{ // capture everying by reference, t by value or t will "disappear" (go out of scope) before the execution of the functor
+    if (2 > t.size())
+      continue; // skip groups with less than two members
+
+    asyncs.push_back(std::async([&,t]{ // capture everying by
+				       // reference, t by value or t
+				       // will "disappear" (go out of
+				       // scope) before the execution
+				       // of the functor
     	  team t1{t};
 	  t1.reputation(compute_reputation(t1));
 	  std::lock_guard<std::mutex> _m{m}; // unlocked at the exit of the function

@@ -1,3 +1,4 @@
+#include <future>
 #include <limits>
 #include <set>
 #include <string>
@@ -35,7 +36,7 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
     all_comp.insert(i);
     user u = g.topuser(i);
 
-    std::cout << "c" << i << " => " << u.get_name() << std::endl;
+    std::cerr << "c" << i << " => " << u.get_name() << std::endl;
 
     top_users[i] = u;
   }
@@ -43,6 +44,7 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
   std::cout << "teamNumber, teamRep, best_max,  best_avg,only_best" << std::endl;
 
   for (auto i = 0; i < iteration; ++i) {
+    //    std::async([&,i]{
    user suser = g.random_user();
    unsigned scomp = suser.get_best_competence();
 
@@ -80,6 +82,7 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
    } catch (std::exception e) {
      std::cerr << "skipping iteration " << i << " because no team is possible" << std::endl;
    }
+   //      });
   }
 }
 
@@ -95,25 +98,5 @@ int main(int argc, char* argv[]) {
 
   testUserCentricCSV(g, std::stoi(argv[3]), 1000);
 
-  // find all
-  //auto names = get(boost::vertex_name, g);
-  //  std::vector<std::future<void>> threads;
-  //  int i = 0;
-  //   for (auto it = vertices(g); it.first != it.second; ++it.first) {
-//     /*threads.push_back(std::async(//[](int id, std::string name){
-// 	  //std::cerr << i << " " << names[*(it.first)] << std::endl;
-// 	  function
-// 	  //std::cerr << id << " " << name << std::endl;
-// 	    //}
-// 	    , i, names[*(it.first)]));*/
-//     threads.push_back(std::async([]{std::cerr << "TEST\n";}));
-//   }
-
-//   auto f = std::async(called_from_async);
-//   f.get();
-
-//   for (auto f = threads.begin(); threads.end() != f; ++f)
-//     std::cout << "out\n";
-//     //(*f).wait();
   
 }
