@@ -10,7 +10,7 @@
 class teamgenerator {
 public:
   void add(unsigned const& comp, const user& u);
-  bool has_next();
+  bool has_next() const;
   team next();
   void print() const noexcept;
 private:

@@ -23,9 +23,9 @@ void teamgenerator::add(unsigned const& comp, const user& u) {
   candidates[comp].push_back(u);
 }
 
-bool teamgenerator::has_next() {
+bool teamgenerator::has_next() const {
   for (auto cc :counters)
-    if (std::get<1>(cc) != (candidates[std::get<0>(cc)].size() - 1))
+    if (std::get<1>(cc) != (candidates.at(std::get<0>(cc)).size() - 1))
       return true;
 
   return false;

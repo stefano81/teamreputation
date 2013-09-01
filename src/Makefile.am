@@ -1,6 +1,4 @@
 # what flags you want to pass to the C compiler & linker
-CPPFLAGS = -std=c++11 -g -O2 -Werror
-LDFLAGS = 
 
 # this lists the binaries to produce, the (non-PHONY, binary) targets in
 # the previous manual Makefile

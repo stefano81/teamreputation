@@ -7,6 +7,11 @@ AC_CONFIG_HEADERS([src/config.hpp])
 
 AC_CANONICAL_HOST
 
+CXXFLAGS="-std=c++11 -g0 -O3 -Werror -I/opt/local/include"
+LDFLAGS=
+
+
+
 # Checks for programs.
 AC_PROG_CXX([g++ clang++])
 

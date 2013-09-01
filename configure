@@ -2145,6 +2145,11 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
 
+CXXFLAGS="-std=c++11 -g0 -O3 -Werror -I/opt/local/include"
+LDFLAGS=
+
+
+
 # Checks for programs.
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
