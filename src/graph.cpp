@@ -91,12 +91,15 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
 
 user graph::topuser(const unsigned &competence) const {
   user u;
+
   for (auto it = begin(users); end(users) != it; ++it) {
     user t = std::get<0>(std::get<1>(*it));
 
+    if (!t.is_active()) continue;
+
     float ct{t.get_competence(competence)};
     float ut{u.get_competence(competence)};
-    //    std::cerr << ct << " > " << ut << std::endl;
+
     if (ct > ut) {
       u = t;
     }
@@ -105,16 +108,16 @@ user graph::topuser(const unsigned &competence) const {
   return u;
 }
 
-user graph::get_user(const Vertex &v) {
+user graph::get_user(const Vertex &v) const {
   auto user_name = get(boost::vertex_name, this->g);
   std::string un = user_name[v];
-  std::pair<user, Vertex> up = users[un];
+  std::pair<user, Vertex> up = users.at(un);
 
   return up.first;
 }
 
-Vertex graph::get_vertex(const user &u) {
-  return users[u.get_name()].second;
+Vertex graph::get_vertex(const user &u) const {
+  return users.at(u.get_name()).second;
 }
 
 user graph::random_user() {
@@ -221,7 +224,7 @@ double graph::compute_reputation(const team &t) {
   return reputation/(t.size() * (t.size() - 1));
 }
 
-team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) {
+team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) const {
   auto users = possible_users(suser, search_level);
 
   if (0 == users.size()) throw 0;
@@ -270,7 +273,7 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
   throw std::exception{};
 }
 
-std::set<user> graph::possible_users(const user &suser, const unsigned &search_level) {
+std::set<user> graph::possible_users(const user &suser, const unsigned &search_level) const {
   std::set<user> candidates;
   std::vector<std::pair<Vertex, unsigned>> to_process;
 

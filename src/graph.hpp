@@ -29,7 +29,7 @@ public:
 
   user topuser(const unsigned &compentece) const;
   user random_user();
-  team find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level);
+  team find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) const;
   team compute_top_users(const std::map<unsigned, user> &top_users, const std::set<unsigned> &competeces);
   double compute_reputation(const team &t);
 
@@ -44,9 +44,9 @@ private:
 
   // private methods
   void load_dot(const std::string &userfile, const std::string &edgefile);
-  user get_user(const Vertex &v);
-  Vertex get_vertex(const user &u);
-  std::set<user> possible_users(const user &suser, const unsigned &search_level);
+  user get_user(const Vertex &v) const;
+  Vertex get_vertex(const user &u) const;
+  std::set<user> possible_users(const user &suser, const unsigned &search_level) const;
   double my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const;
   double distance(const unsigned &c1, const unsigned &c2) const;
   double similarity(const unsigned &c1, const unsigned &c2) const;
