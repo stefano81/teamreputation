@@ -2148,8 +2148,6 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 CXXFLAGS="-std=c++11 -g0 -O3 -Werror -I/opt/local/include"
 LDFLAGS=
 
-
-
 # Checks for programs.
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -3204,8 +3202,7 @@ $as_echo "$as_me: Using clang++ on $host_os" >&6;}
 	     *darwin*10.*.*)
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: Applying special configuration for clang" >&5
 $as_echo "$as_me: Applying special configuration for clang" >&6;}
-		CXXFLAGS="$CXXFLAGS -stdlib=c++11 -U__STRICT_ANSI__"
-				   #-I/opt/local/libexec/llvm-3.3/lib/c++/v1"
+		CXXFLAGS="$CXXFLAGS -stdlib=c++11 -U__STRICT_ANSI__ -I/opt/local/libexec/llvm-3.3/lib/c++/v1"
 		;;
 	esac
 	;;

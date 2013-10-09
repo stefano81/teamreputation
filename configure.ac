@@ -10,8 +10,6 @@ AC_CANONICAL_HOST
 CXXFLAGS="-std=c++11 -g0 -O3 -Werror -I/opt/local/include"
 LDFLAGS=
 
-
-
 # Checks for programs.
 AC_PROG_CXX([g++ clang++])
 
@@ -46,8 +44,7 @@ case $CXX in
 	case $host_os in
 	     *darwin*10.*.*)
 		AC_MSG_NOTICE([Applying special configuration for clang])
-		CXXFLAGS="$CXXFLAGS -stdlib=c++11 -U__STRICT_ANSI__" 
-				   #-I/opt/local/libexec/llvm-3.3/lib/c++/v1"
+		CXXFLAGS="$CXXFLAGS -stdlib=c++11 -U__STRICT_ANSI__ -I/opt/local/libexec/llvm-3.3/lib/c++/v1"
 		;;
 	esac
 	;;

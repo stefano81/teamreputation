@@ -70,7 +70,7 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
        
        double tr = g.compute_reputation(tt);
 
-       wtut +=tr;
+       wtut += tr;
 
        wtur = std::max(wtur, tr);
      }
@@ -82,15 +82,13 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
    } catch (std::exception e) {
      std::cerr << "skipping iteration " << i << " because no team is possible" << std::endl;
    }
-   //      });
+
   }
 }
 
 
 int main(int argc, char* argv[]) {
   std::string userfile{argv[1]}, edgefile{argv[2]};
-
-  //  std::map<std::string, Vertex> users;
 
   // load data
   graph g{userfile, edgefile};

@@ -1,6 +1,6 @@
 #include "team.hpp"
 
-//#include <algorithm>
+#include <algorithm>
 #include <iostream>
 
 double team::reputation() const {
@@ -13,8 +13,10 @@ double team::reputation() const {
 std::set<unsigned> team::competences() {
   std::set<unsigned> comps;
 
-  for (auto m : members)
-    comps.insert(std::get<0>(m));
+  for_each(std::begin(members), std::end(members),
+	   [&comps](std::pair<unsigned, user> m) {
+	     comps.insert(std::get<0>(m));
+	   });
 
   return comps;
 }
@@ -26,10 +28,12 @@ std::map<unsigned, user> team::get_members() const {
 unsigned team::size() const {
   std::set<user> unique_members;
   std::cerr << "computing size" << std::endl;
-  for (auto up : members) {
-    std::cerr << std::get<1>(up).get_name() << std::endl;
-    unique_members.insert(std::get<1>(up));
-  }
+
+  for_each(std::begin(members), std::end(members),
+	   [&unique_members](std::pair<unsigned, user> up) {
+	     std::cerr << std::get<1>(up).get_name() << std::endl;
+	     unique_members.insert(std::get<1>(up));
+	   });
 
   return unique_members.size();
 }
@@ -38,8 +42,11 @@ void team::print() const noexcept {
   for (auto m : members)
     std::cerr << std::get<0>(m) << ' ' << std::get<1>(m).get_name() << std::endl;
 
-  std::cerr << "reputation: ";
+  std::cerr << "reputation";
   if (is_computed)
-    std::cerr << r;
+    std::cerr << ": " << r;
+  else
+    std::cerr << " unknown";
+
   std::cerr << std::endl;
 }
