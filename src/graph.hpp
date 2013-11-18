@@ -31,7 +31,7 @@ public:
   user random_user();
   team find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) const;
   team compute_top_users(const std::map<unsigned, user> &top_users, const std::set<unsigned> &competeces);
-  double compute_reputation(const team &t);
+  double compute_reputation(const team &t) const;
 
 private:
   // private fields
@@ -50,4 +50,5 @@ private:
   double my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const;
   double distance(const unsigned &c1, const unsigned &c2) const;
   double similarity(const unsigned &c1, const unsigned &c2) const;
+  bool is_active(const std::string &name) const;
 };

@@ -30,6 +30,10 @@ void graph::stats() {
   std::cerr << "Edge count : " << num_edges(this->g) << std::endl;
 }
 
+bool graph::is_active(const std::string &name) const {
+    return 0 != std::stoi(name) % 9;
+}
+
 void graph::load_dot(const std::string &userfilepath, const std::string &edgefilepath) {
   std::ifstream userfile{userfilepath};
   std::ifstream edgefile{edgefilepath};
@@ -45,8 +49,9 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
 
     auto token = begin(tokenizer);
 
-    user uo{*(token++)};
-    
+    user uo{*token, is_active(*token)};
+    ++token;
+
     for(int i = 0; i < 10 && end(tokenizer) != token; ++i, ++token) {
       float val{std::stof(*token)};
       if (0.0 < val) {
@@ -199,7 +204,7 @@ double graph::my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) con
   return rep;
 }
 
-double graph::compute_reputation(const team &t) {
+double graph::compute_reputation(const team &t) const {
   // get vertexes
   double reputation = 0.0;
   int num = 0;
@@ -233,8 +238,8 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
 
   for (auto u : users)
     for (auto c : taskcomp)
-      if (u.has(c))
-	tg.add(c, u);
+        if (u.has(c) && u.is_active())
+            tg.add(c, u);
 
   std::vector<team> teams;
 
