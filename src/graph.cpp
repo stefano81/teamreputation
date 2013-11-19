@@ -133,7 +133,7 @@ user graph::get_user(const Vertex &v) const {
   return up.first;
 }
 
-Vertex graph::get_vertex(const user &u) const {
+const Vertex & graph::get_vertex(const user &u) const {
   return users.at(u.get_name()).second;
 }
 

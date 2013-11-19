@@ -45,7 +45,7 @@ private:
   // private methods
   void load_dot(const std::string &userfile, const std::string &edgefile);
   user get_user(const Vertex &v) const;
-  Vertex get_vertex(const user &u) const;
+  const Vertex & get_vertex(const user &u) const;
   std::set<user> possible_users(const user &suser, const unsigned &search_level) const;
   double my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const;
   double distance(const unsigned &c1, const unsigned &c2) const;
