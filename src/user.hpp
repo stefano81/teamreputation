@@ -6,6 +6,8 @@
 #include <utility>
 #include <vector>
 
+using namespace std::rel_ops;
+
 class user {
 public:
   user(const std::string &name="", const bool &active = true) : id{name}, _active{active} {}
@@ -21,13 +23,16 @@ public:
   
   bool is_active() const noexcept {return this->_active;}
 
-  bool operator==(const user&other) const;
-  bool operator<(const user&other) const { return id < other.id;}
+  bool operator==(const user& other) const;
+  bool operator<(const user& other) const { return id < other.id;}
+	user& operator=(const user& other) {
+		
+	}
 private:
   bool _active;
   std::string id;
   std::map<unsigned, float> competences;
 };
 
-using namespace std::rel_ops;
+
 

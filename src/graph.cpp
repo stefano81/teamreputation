@@ -108,19 +108,20 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
 }
 
 user graph::topuser(const unsigned &competence) const {
-  user u;
+	auto it = begin(users);
+	const user *u = & std::get<0>(std::get<1>(*it));
+	
+  for (; end(users) != it; ++it) {
+    const user *t = &std::get<0>(std::get<1>(*it));
 
-  for (auto it = begin(users); end(users) != it; ++it) {
-    user &t = std::get<0>(std::get<1>(*it));
+    if (!t->is_active()) continue;
 
-    if (!t.is_active()) continue;
-
-    if (t.get_competence(competence) > u.get_competence(competence)) {
+    if (t->get_competence(competence) > u->get_competence(competence)) {
       u = t;
     }
   }
 
-  return u;
+  return *u;
 }
 
 user graph::get_user(const Vertex &v) const {
