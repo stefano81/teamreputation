@@ -59,7 +59,7 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
     for(int i = 0; i < 10 && end(tokenizer) != token; ++i, ++token) {
       float val{std::stof(*token)};
       if (0.0 < val) {
-	uo.add_competence(i, val);
+				uo.add_competence(i, val);
       }
     }
 
@@ -102,14 +102,11 @@ user graph::topuser(const unsigned &competence) const {
   user u;
 
   for (auto it = begin(users); end(users) != it; ++it) {
-    user t = std::get<0>(std::get<1>(*it));
+    user &t = std::get<0>(std::get<1>(*it));
 
     if (!t.is_active()) continue;
 
-    float ct{t.get_competence(competence)};
-    float ut{u.get_competence(competence)};
-
-    if (ct > ut) {
+    if (t.get_competence(competence) > u.get_competence(competence)) {
       u = t;
     }
   }
@@ -118,7 +115,8 @@ user graph::topuser(const unsigned &competence) const {
 }
 
 user graph::get_user(const Vertex &v) const {
-  auto user_name = get(boost::vertex_name, this->g);
+  static auto user_name = get(boost::vertex_name, this->g);
+	
   std::string un = user_name[v];
   std::pair<user, Vertex> up = users.at(un);
 
@@ -131,6 +129,7 @@ Vertex graph::get_vertex(const user &u) const {
 
 user graph::random_user() {
   Vertex v = random_vertex(this->g, random);
+	
   return get_user(v);
 }
 
@@ -182,22 +181,22 @@ double graph::my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) con
       auto j = target(*e.first, this->g);
 
       if (j == u)
-	continue; // cicle with source
+				continue; // cicle with source
 
       auto re = reputation_value[*e.first];
       auto l = similarity(comp, reputation_argument[*e.first]);
       if (v != j) {
-	auto w = 1 / ((2 + re) * l);
+				auto w = 1 / ((2 + re) * l);
 
-	if (min_w[j] < w) {
-	  min_w[j] = w;
-	  reps[j] = std::min(reps[j], (re * l));
-	}
+				if (min_w[j] < w) {
+					min_w[j] = w;
+					reps[j] = std::min(reps[j], (re * l));
+				}
       } else {
-	auto cp = reps[source(*e.first, this->g)];
-	auto cr = std::min(cp, (re * l));
+				auto cp = reps[source(*e.first, this->g)];
+				auto cr = std::min(cp, (re * l));
 
-	rep = std::min(rep, cr);
+				rep = std::min(rep, cr);
       }
     }
 
@@ -217,15 +216,15 @@ double graph::compute_reputation(const team &t) const {
   for (auto it = begin(m); it != end(m); ++it) {
     for (auto it2 = begin(m); it2 != end(m); ++it2) {
       if (std::get<1>(*it2) != std::get<1>(*it)) {
-	auto u = std::get<1>(*it);
-	auto v = std::get<1>(*it2);
-	std::cerr << "computing reputation between " << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << std::endl;
+				auto u = std::get<1>(*it);
+				auto v = std::get<1>(*it2);
+				std::cerr << "computing reputation between " << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << std::endl;
 
-	try {
-	  reputation += my_bfs(get_vertex(u), get_vertex(v), std::get<0>(*it2));
-	} catch (int ex) {
-	  std::cerr << "there is no direct path between u and v" << std::endl;
-	}
+				try {
+					reputation += my_bfs(get_vertex(u), get_vertex(v), std::get<0>(*it2));
+				} catch (int ex) {
+					std::cerr << "there is no direct path between u and v" << std::endl;
+				}
       }
     }
   }
@@ -242,8 +241,8 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
 
   for (auto u : users)
     for (auto c : taskcomp)
-        if (u.has(c) && u.is_active())
-            tg.add(c, u);
+			if (u.has(c) && u.is_active())
+				tg.add(c, u);
 
   std::vector<team> teams;
 
@@ -258,15 +257,15 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
       continue; // skip groups with less than two members
 
     asyncs.push_back(std::async([&,t]{ // capture everying by
-				       // reference, t by value or t
-				       // will "disappear" (go out of
-				       // scope) before the execution
-				       // of the functor
-    	  team t1{t};
-	  t1.reputation(compute_reputation(t1));
-	  std::lock_guard<std::mutex> _m{m}; // unlocked at the exit of the function
-	  teams.push_back(t1);
-	})
+					// reference, t by value or t
+					// will "disappear" (go out of
+					// scope) before the execution
+					// of the functor
+					team t1{t};
+					t1.reputation(compute_reputation(t1));
+					std::lock_guard<std::mutex> _m{m}; // unlocked at the exit of the function
+					teams.push_back(t1);
+				})
       );
   }
 
@@ -304,19 +303,19 @@ std::set<user> graph::possible_users(const user &suser, const unsigned &search_l
       std::cerr << "possible users: friends of " << get_user(std::get<0>(u)).get_name() << std::endl;
       
       for (auto eit = out_edges(std::get<0>(u), this->g); eit.first != eit.second; (eit.first)++) {
-	auto v = target(*eit.first, this->g);
-	std::cerr << "possible users: " << get_user(v).get_name() << std::endl;	
+				auto v = target(*eit.first, this->g);
+				std::cerr << "possible users: " << get_user(v).get_name() << std::endl;	
 	
-	auto res = candidates.insert(get_user(v));
+				auto res = candidates.insert(get_user(v));
 	
-	if (res.second) {
-	  std::cerr << "possible users: inserted" << std::endl;
-	  to_process.push_back({std::move(v), n});
-	} else {
-	  std::cerr << "possible users: already known" << std::endl;
-	}
+				if (res.second) {
+					std::cerr << "possible users: inserted" << std::endl;
+					to_process.push_back({std::move(v), n});
+				} else {
+					std::cerr << "possible users: already known" << std::endl;
+				}
 
-	std::cerr << "possible users: candidates.size() == " << candidates.size() << std::endl;
+				std::cerr << "possible users: candidates.size() == " << candidates.size() << std::endl;
       }
     }
   }
