@@ -127,7 +127,7 @@ user graph::topuser(const unsigned &competence) const {
 user graph::get_user(const Vertex &v) const {
   static auto user_name = get(boost::vertex_name, this->g);
 	
-  std::string un = user_name[v];
+  const std::string &un = user_name[v];
   std::pair<user, Vertex> up = users.at(un);
 
   return up.first;
