@@ -31,7 +31,11 @@ void graph::stats() {
 }
 
 bool graph::is_active(const std::string &name) const {
-    return 0 != std::stoi(name) % 9;
+  const char *s = name.c_str();
+  while(*s!='\0' && (*s<'0' || *s>'9')) s++;
+  int n = atoi(s);
+  //std::cerr << "test active " << name << std::endl;
+  return 0 != n % 9;
 }
 
 void graph::load_dot(const std::string &userfilepath, const std::string &edgefilepath) {
