@@ -42,6 +42,15 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
   std::ifstream userfile{userfilepath};
   std::ifstream edgefile{edgefilepath};
 
+  if ( userfile.fail() ) {
+    throw std::ios_base::failure( "error opening user file: " + userfilepath);
+  }
+  if ( edgefile.fail() ) {
+    throw std::ios_base::failure( "error opening edge file: " + edgefilepath);
+  }
+
+  
+
   auto user_name = get(boost::vertex_name, this->g);
   
   // add users
