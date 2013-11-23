@@ -5,12 +5,15 @@
 #include <ostream>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 using namespace std::rel_ops;
 
 class user {
 public:
-  user(const std::string &name="", const bool &active = true) : id{name}, _active{active} {}
+  user(const std::string &name = "", const bool &active = true) : id{name}, _active{active} {
+		//std::cerr << "user: " << name << " is " << (active?"":"not ") << "active" << std::endl;
+	}
   
   void add_competence(const unsigned &name, const float &value) noexcept;
   float get_competence(const unsigned &name) const;

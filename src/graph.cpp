@@ -32,9 +32,9 @@ void graph::stats() {
 
 bool graph::is_active(const std::string &name) const {
   const char *s = name.c_str();
-  while(*s!='\0' && (*s<'0' || *s>'9')) s++;
+  while(*s!='\0' && (*s < '0' || *s > '9')) s++;
   int n = atoi(s);
-  //std::cerr << "test active " << name << std::endl;
+
   return 0 != n % 9;
 }
 
@@ -48,8 +48,6 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
   if ( edgefile.fail() ) {
     throw std::ios_base::failure( "error opening edge file: " + edgefilepath);
   }
-
-  
 
   auto user_name = get(boost::vertex_name, this->g);
   
@@ -74,8 +72,13 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
 
     auto u = add_vertex(this->g);
     user_name[u] = uo.get_name();
-    this->users[uo.get_name()] = std::make_pair(uo, u);
+    this->users[uo.get_name()] = std::make_pair(std::move(uo), u);
   }
+
+	std::cerr << "how many users: " << users.size() << std::endl;
+	for (auto it = begin(this->users); it != end(this->users); ++it) {
+		std::cerr << "users: " << it->first << " \"" << it->second.first.get_name() << "\"" << std::endl;
+	}
 
   // add edges
   boost::char_separator<char> eq_sep{"="};
@@ -108,32 +111,38 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
 }
 
 user graph::topuser(const unsigned &competence) const {
+	std::cerr << "top user for " << competence << std::endl;
 	auto it = begin(users);
-	const user *u = & std::get<0>(std::get<1>(*it));
-	
-  for (; end(users) != it; ++it) {
-    const user *t = &std::get<0>(std::get<1>(*it));
+	user u = std::get<0>(std::get<1>(*it));
+	unsigned i = 0;
+	std::cerr << i++ << " " << u.get_name() << std::endl;
 
-    if (!t->is_active()) continue;
+  for (++it ; end(users) != it; ++it) {
+    user t = std::get<0>(std::get<1>(*it));
 
-    if (t->get_competence(competence) > u->get_competence(competence)) {
+    if (!t.is_active())
+			continue;
+		
+    if (t.get_competence(competence) > u.get_competence(competence)) {
+			std::cerr << i << " update " << u.get_name() << " with " << t.get_name() << std::endl;
       u = t;
     }
+		i++;
   }
 
-  return *u;
+  return u;
 }
 
 user graph::get_user(const Vertex &v) const {
   static auto user_name = get(boost::vertex_name, this->g);
 	
-  const std::string &un = user_name[v];
+  const std::string un = user_name[v];
   std::pair<user, Vertex> up = users.at(un);
 
   return up.first;
 }
 
-const Vertex & graph::get_vertex(const user &u) const {
+Vertex graph::get_vertex(const user &u) const {
   return users.at(u.get_name()).second;
 }
 

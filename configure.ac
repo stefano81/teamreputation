@@ -1,14 +1,11 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.69])
-AC_INIT([teamrep], [0.0.1], [stefano.braghin@deri.org])
+AC_INIT([teamrep], [0.0.1], [stefano.braghin@gmail.com])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([src/config.hpp])
 
 AC_CANONICAL_HOST
-
-CXXFLAGS="-std=c++11 -g0 -O3 -Werror -I/opt/local/include"
-LDFLAGS=
 
 # Checks for programs.
 AC_PROG_CXX([g++ clang++])

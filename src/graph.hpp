@@ -18,7 +18,6 @@ typedef boost::property<boost::vertex_name_t, std::string> VertexProperty;
 typedef boost::property<boost::edge_name_t, unsigned, boost::property<boost::edge_weight_t, float> > EdgeProperty;
 typedef boost::adjacency_list<boost::vecS, boost::listS, boost::directedS, VertexProperty, EdgeProperty> Graph;
 typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
-//typedef boost::graph_traits<Graph>::edge_descriptor Edge;
 
 class graph {
 public:
@@ -45,7 +44,7 @@ private:
   // private methods
   void load_dot(const std::string &userfile, const std::string &edgefile);
   user get_user(const Vertex &v) const;
-  const Vertex & get_vertex(const user &u) const;
+  Vertex get_vertex(const user &u) const;
   std::set<user> possible_users(const user &suser, const unsigned &search_level) const;
   double my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const;
   double distance(const unsigned &c1, const unsigned &c2) const;
