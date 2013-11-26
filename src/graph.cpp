@@ -72,10 +72,13 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
 
     auto u = add_vertex(this->g);
     user_name[u] = uo.get_name();
-    this->users[uo.get_name()] = std::make_pair(std::move(uo), u);
+    std::cerr << "add: " << uo.get_name() << std::endl;
+    auto pair = std::make_pair(std::move(uo), u);
+    this->users[ pair.first.get_name()] = pair;
+    std::cerr << "added: " << pair.first.get_name()<< "add: " << uo.get_name()  << std::endl;
   }
 
-	std::cerr << "how many users: " << users.size() << std::endl;
+	std::cerr << "how many users: " << users.size() << "." <<std::endl;
 	for (auto it = begin(this->users); it != end(this->users); ++it) {
 		std::cerr << "users: " << it->first << " \"" << it->second.first.get_name() << "\"" << std::endl;
 	}

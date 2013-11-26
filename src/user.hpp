@@ -14,7 +14,14 @@ public:
   user(const std::string &name = "", const bool &active = true) : id{name}, _active{active} {
 		//std::cerr << "user: " << name << " is " << (active?"":"not ") << "active" << std::endl;
 	}
-  
+	/*
+	user(user&& u){
+	 std::cerr <<"MOVE U\n";
+	 _active = u._active;
+	 id = std::move(u.id);
+	 competences = std::move(u.competences);
+	}*/
+
   void add_competence(const unsigned &name, const float &value) noexcept;
   float get_competence(const unsigned &name) const;
   std::vector<unsigned> get_competences() const;
@@ -28,9 +35,7 @@ public:
 
   bool operator==(const user& other) const;
   bool operator<(const user& other) const { return id < other.id;}
-	user& operator=(const user& other) {
-		
-	}
+  //user& operator=(const user& other) {}
 private:
   bool _active;
   std::string id;
