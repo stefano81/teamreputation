@@ -93,7 +93,7 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
 int main(int argc, char* argv[]) {
   if (argc != 4) {
     std::cerr << "Invalid parameter number. Usage" << std::endl << 
-      "  " << argv[0] << "<userfile> <edgefile> <search depth>" << std::endl;
+      "  " << argv[0] << "<userfile> <edgefile> <iterations>" << std::endl;
     exit(1);
   }
 

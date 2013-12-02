@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <future>
 #include <iostream>
 #include <limits>
 #include <mutex>
@@ -268,36 +267,26 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
 
   std::vector<team> teams;
 
-  std::vector<std::future<void> > asyncs;
-
-  std::mutex m;
-
+  team maxRepTeam;
+  double maxRep = std::numeric_limits<double>::lowest();
+  bool found = false;
+  
   while (tg.has_next()) {
     team t = tg.next();
 
     if (2 > t.size())
       continue; // skip groups with less than two members
 
-    asyncs.push_back(std::async([&,t]{ // capture everying by
-					// reference, t by value or t
-					// will "disappear" (go out of
-					// scope) before the execution
-					// of the functor
-					team t1{t};
-					t1.reputation(compute_reputation(t1));
-					std::lock_guard<std::mutex> _m{m}; // unlocked at the exit of the function
-					teams.push_back(t1);
-				})
-      );
+    t.reputation(compute_reputation(t));
+    if ( maxRep < t.reputation() ) {
+      maxRep = t.reputation();
+      maxRepTeam = t;
+      found = true;
+    }
   }
 
-  for (auto f = begin(asyncs); end(asyncs) != f; ++f)
-    f->get();
-
-  if (begin(teams) != end(teams)) {
-    sort(begin(teams), end(teams), [](const team &t1, const team &t2) -> bool { return t1.reputation() > t2.reputation();});
-   
-    return *begin(teams);
+  if (found) {
+    return maxRepTeam;
   } 
 
   throw std::exception{};
