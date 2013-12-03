@@ -27,26 +27,27 @@ std::map<unsigned, user> team::get_members() const {
 
 unsigned team::size() const {
   std::set<user> unique_members;
-  std::cerr << "computing size" << std::endl;
+  //std::cerr << "computing size" << std::endl;
 
   for_each(std::begin(members), std::end(members),
 	   [&unique_members](std::pair<unsigned, user> up) {
-	     std::cerr << std::get<1>(up).get_name() << std::endl;
+	     //std::cerr << std::get<1>(up).get_name() << std::endl;
 	     unique_members.insert(std::get<1>(up));
 	   });
 
   return unique_members.size();
 }
 
-void team::print() const noexcept {
-  for (auto m : members)
-    std::cerr << std::get<0>(m) << ' ' << std::get<1>(m).get_name() << std::endl;
 
-  std::cerr << "reputation";
-  if (is_computed)
-    std::cerr << ": " << r;
+std::ostream& operator<< (std::ostream &os, const team &t) {
+  for (auto m : t.members)
+    os << "competence: " << std::get<0>(m) << ", user: \"" << std::get<1>(m).get_name() << '"' << std::endl;
+
+  os << " reputation";
+  if (t.is_computed)
+    os << ": " << t.r;
   else
-    std::cerr << " unknown";
+    os << " unknown";
 
-  std::cerr << std::endl;
+  os << std::endl;
 }

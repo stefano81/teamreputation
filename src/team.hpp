@@ -37,7 +37,7 @@ public:
 
   iterator begin() { return iterator(*this); };
   iterator end() {return iterator(*this, true); };
-  void print() const noexcept;
+  friend std::ostream& operator<< (std::ostream &, const team&);
 private:
   bool is_computed;
   double r;
