@@ -7,6 +7,8 @@
 #include <mutex>
 #include <queue>
 
+#include <unordered_set>
+#include <unordered_map>
 
 #include <boost/format.hpp>
 
@@ -176,56 +178,80 @@ double graph::distance(const unsigned &c1, const unsigned &c2) const {
 }
 
 
+class DijkstraQueueElement {
+  Vertex const *vertex;
+  double distance;
+ public:
+  DijkstraQueueElement(const Vertex &v, double d): vertex(&v), distance(d) {}
+
+  DijkstraQueueElement(const DijkstraQueueElement &other): vertex(other.vertex), distance(other.distance) {}
+  
+  DijkstraQueueElement& operator=(const DijkstraQueueElement& other){
+    vertex = other.vertex;
+    distance = other.distance;
+    return *this;
+  }
+  
+  bool operator<(const DijkstraQueueElement& o) const {
+    return distance > o.distance;
+  }
+  
+  const Vertex& getVertex() const{
+    return *vertex;
+  }
+};
+
 double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const unsigned &comp) const {
-  std::queue<Vertex> tovisit;
-  std::set<Vertex> visited;
-  double rep;
-  std::map<Vertex, double> reps;
-  std::map<Vertex, double> min_w;
-
-  rep = std::numeric_limits<double>::min();
-  reps[sourceVertex] = std::numeric_limits<double>::min();
-  min_w[destVertex] = std::numeric_limits<double>::max();
-
-  tovisit.push(sourceVertex);
-
   auto reputation_argument = get(boost::edge_name, g);
   auto reputation_value = get(boost::edge_weight, g);
 
-  while (!tovisit.empty()) {
-    bool inserted = false;
-
-    Vertex i = tovisit.front();
+  std::unordered_map<Vertex, double> distance;
+  std::unordered_map<Vertex, double> reputation;
+  std::unordered_set<Vertex> visited;
+  
+  distance[sourceVertex] = 0.0;
+  reputation[sourceVertex] = 1.0;
+  std::priority_queue<DijkstraQueueElement> tovisit;
+  
+  tovisit.push(DijkstraQueueElement(sourceVertex, 0.0));
+  
+  while ( !tovisit.empty() ) {
+    Vertex u = tovisit.top().getVertex();
     tovisit.pop();
-
-    for (auto e = out_edges(i, this->g); e.first != e.second; ++(e.first)) {
-      Vertex currentVertex = target(*e.first, this->g);
-
-      if (currentVertex == sourceVertex)
-	continue; // cicle with source
-
-      auto re = reputation_value[*e.first];
-      auto l = similarity(comp, reputation_argument[*e.first]);
-      if (destVertex != currentVertex) {
-	auto w = 1 / ((2 + re) * l);
-	
-	if (min_w[currentVertex] < w) {
-	  min_w[currentVertex] = w;
-	  reps[currentVertex] = std::min(reps[currentVertex], (re * l));
-	}
-      } else {
-	auto cp = reps[source(*e.first, this->g)];
-	auto cr = std::min(cp, (re * l));
-	
-	rep = std::min(rep, cr);
-      }
-    }
-
-    if (!inserted)
+    if ( u == destVertex )
       break;
-  }
+    if ( visited.count(u) > 0 )
+      continue;
+    
+    visited.insert(u);
+    
+    for (auto e = out_edges(u, this->g); e.first != e.second; ++(e.first)) {
+      Vertex currentVertex = target(*e.first, this->g); 
+      std::cerr << " testo "<< currentVertex <<std::endl;
 
-  return rep;
+      double re = reputation_value[*e.first];
+      if ( re < 0 && currentVertex != destVertex )
+	continue; // chain of trust
+      double l = similarity(comp, reputation_argument[*e.first]);
+      if ( l == 0 )
+	continue; // chain of trust
+      
+      double w = 1 / ((2 + re) * l); // dist_between(u, currentVertex)
+      double alt = distance[u] + w;
+      if ( distance.count(currentVertex) == 0 || alt < distance[currentVertex] ) {
+	distance[currentVertex] = alt;
+	reputation[destVertex] = std::min(reputation[u], re * l);
+	if ( visited.count(currentVertex) == 0 ) {
+	  tovisit.push( DijkstraQueueElement(currentVertex, distance[currentVertex]) );
+	}
+      }
+    } //for
+  } //while
+
+  if ( distance.count(destVertex) == 0 )
+    return 0;
+  
+  return reputation[destVertex];
 }
 
 double graph::compute_reputation(const team &t) const {
