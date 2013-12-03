@@ -233,23 +233,23 @@ double graph::compute_reputation(const team &t) const {
   double reputation = 0.0;
   int num = 0;
   auto m = t.get_members();
-
+  
   for (auto it = begin(m); it != end(m); ++it) {
     for (auto it2 = begin(m); it2 != end(m); ++it2) {
       if (std::get<1>(*it2) != std::get<1>(*it)) {
-				auto u = std::get<1>(*it);
-				auto v = std::get<1>(*it2);
-				std::cerr << "computing reputation between " << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << std::endl;
-
-				try {
-					reputation += my_bfs(get_vertex(u), get_vertex(v), std::get<0>(*it2));
-				} catch (int ex) {
-					std::cerr << "there is no direct path between u and v" << std::endl;
-				}
+	auto u = std::get<1>(*it);
+	auto v = std::get<1>(*it2);
+	std::cerr << "computing reputation between " << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << std::endl;
+	
+	try {
+	  reputation += my_bfs(get_vertex(u), get_vertex(v), std::get<0>(*it2));
+	} catch (int ex) {
+	  std::cerr << "there is no direct path between u and v" << std::endl;
+	}
       }
     }
   }
-
+  
   return reputation/(t.size() * (t.size() - 1));
 }
 
@@ -262,8 +262,8 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
 
   for (auto u : users)
     for (auto c : taskcomp)
-			if (u.has(c) && u.is_active())
-				tg.add(c, u);
+      if (u.has(c) && u.is_active())
+	tg.add(c, u);
 
   std::vector<team> teams;
 
