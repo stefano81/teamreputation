@@ -176,7 +176,7 @@ double graph::distance(const unsigned &c1, const unsigned &c2) const {
 }
 
 
-double graph::my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const {
+double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const unsigned &comp) const {
   std::queue<Vertex> tovisit;
   std::set<Vertex> visited;
   double rep;
@@ -184,10 +184,10 @@ double graph::my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) con
   std::map<Vertex, double> min_w;
 
   rep = std::numeric_limits<double>::min();
-  reps[u] = std::numeric_limits<double>::min();
-  min_w[v] = std::numeric_limits<double>::max();
+  reps[sourceVertex] = std::numeric_limits<double>::min();
+  min_w[destVertex] = std::numeric_limits<double>::max();
 
-  tovisit.push(u);
+  tovisit.push(sourceVertex);
 
   auto reputation_argument = get(boost::edge_name, g);
   auto reputation_value = get(boost::edge_weight, g);
@@ -199,25 +199,25 @@ double graph::my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) con
     tovisit.pop();
 
     for (auto e = out_edges(i, this->g); e.first != e.second; ++(e.first)) {
-      auto j = target(*e.first, this->g);
+      Vertex currentVertex = target(*e.first, this->g);
 
-      if (j == u)
-				continue; // cicle with source
+      if (currentVertex == sourceVertex)
+	continue; // cicle with source
 
       auto re = reputation_value[*e.first];
       auto l = similarity(comp, reputation_argument[*e.first]);
-      if (v != j) {
-				auto w = 1 / ((2 + re) * l);
-
-				if (min_w[j] < w) {
-					min_w[j] = w;
-					reps[j] = std::min(reps[j], (re * l));
-				}
+      if (destVertex != currentVertex) {
+	auto w = 1 / ((2 + re) * l);
+	
+	if (min_w[currentVertex] < w) {
+	  min_w[currentVertex] = w;
+	  reps[currentVertex] = std::min(reps[currentVertex], (re * l));
+	}
       } else {
-				auto cp = reps[source(*e.first, this->g)];
-				auto cr = std::min(cp, (re * l));
-
-				rep = std::min(rep, cr);
+	auto cp = reps[source(*e.first, this->g)];
+	auto cr = std::min(cp, (re * l));
+	
+	rep = std::min(rep, cr);
       }
     }
 
