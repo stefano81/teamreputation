@@ -45,7 +45,7 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
     top_users[i] = u;
   }
 
-  std::cout << "teamNumber, teamRep, best_max,  best_avg,only_best" << std::endl;
+  std::cout << "teamNumber, teamRep, best_max, best_avg, only_best" << std::endl;
   
   for (auto i = 0; i < iteration; ++i) {
     // std::async(std::launch::async, [&,i]{
@@ -81,6 +81,8 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
 	  }
      
 	  std::cout << wtur << ',' << (wtur / steam.size()) << ',' << g.compute_reputation(otu) << std::endl;
+	  // std::cerr <<"best team" << otu<<std::endl;
+	  
 	} catch (const char *msg) {
 	  std::cerr << "user " << suser.get_name() <<" has no competence, skip" << std::endl;
 	  continue;

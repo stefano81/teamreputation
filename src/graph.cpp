@@ -307,14 +307,13 @@ public:
 
 
 double graph::my_bfs_cached(const Vertex &u, const Vertex &v, const unsigned &comp, reputation_cache &cache) const {
-  std::cerr << "cached bfs ";
+  // std::cerr << "cached bfs ";
   reputation_cache_key k(u,v,comp);
   if ( cache.contains(k) ) {
-    std::cerr << "cache hint!" << std::endl;
+    // std::cerr << "cache hint!" << std::endl;
     return cache.get(k);
   }
-  std::cerr << "cache miss :(" << std::endl;
-
+  // std::cerr << "cache miss :(" << std::endl;
   double rep = my_bfs(u, v, comp);
   cache.set(k, rep);
   return rep;
