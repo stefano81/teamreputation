@@ -36,6 +36,7 @@ private:
   // private fields
   const unsigned seed = 1234567;
   const unsigned ncomp = 10;
+  const unsigned totalHighComp = 4; //(int) Math.ceil(Math.log(ncomp+1)/Math.log(2));
   std::map<std::string, std::pair<user, Vertex> > users;
   boost::random::mt19937 random;
 

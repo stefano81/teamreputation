@@ -164,7 +164,7 @@ double graph::distance(const unsigned &c1, const unsigned &c2) const {
   unsigned p1{c1};
   unsigned p2{c2};
 
-  unsigned distance;
+  unsigned distance = 0;
 
   while (p1 != p2) {
     if (p1 > p2)
@@ -173,8 +173,7 @@ double graph::distance(const unsigned &c1, const unsigned &c2) const {
       p2 = (p2 - 1) / 2;
     ++distance;
   }
-
-  return distance / (double) ncomp;
+  return (distance > totalHighComp) ? 1 : distance / (double) totalHighComp;
 }
 
 
@@ -227,7 +226,6 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
     
     for (auto e = out_edges(u, this->g); e.first != e.second; ++(e.first)) {
       Vertex currentVertex = target(*e.first, this->g); 
-      std::cerr << " testo "<< currentVertex <<std::endl;
 
       double re = reputation_value[*e.first];
       if ( re < 0 && currentVertex != destVertex )
@@ -240,7 +238,7 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
       double alt = distance[u] + w;
       if ( distance.count(currentVertex) == 0 || alt < distance[currentVertex] ) {
 	distance[currentVertex] = alt;
-	reputation[destVertex] = std::min(reputation[u], re * l);
+	reputation[currentVertex] = std::min(reputation[u], re * l);
 	if ( visited.count(currentVertex) == 0 ) {
 	  tovisit.push( DijkstraQueueElement(currentVertex, distance[currentVertex]) );
 	}
@@ -271,7 +269,7 @@ double graph::compute_reputation(const team &t) const {
 	} catch (int ex) {
 	  //std::cerr << "there is no direct path between u and v" << std::endl;
 	}
-	std::cerr << "reputation between " << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << " = " << currRep << std::endl;
+	//std::cerr << "reputation between " << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << " = " << currRep << std::endl;
 	reputation += currRep;
       }
     }
