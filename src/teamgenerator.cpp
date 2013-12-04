@@ -11,7 +11,7 @@ void teamgenerator::print() const noexcept {
 }
 
 void teamgenerator::add(unsigned const& comp, const user& u) {
-  std::cerr << "teamgenerator: adding " << u.get_name() << " for " << comp << std::endl;
+  // std::cerr << "teamgenerator: adding " << u.get_name() << " for " << comp << std::endl;
   if (end(candidates) == candidates.find(comp)) {
     counters[comp] = 0;
   }
@@ -38,7 +38,7 @@ team teamgenerator::next() {
   for (auto c : counters) {
     unsigned cn = std::get<0>(c), cc = std::get<1>(c);
 
-    std::cerr << cn << '-' << cc << std::endl;
+    // std::cerr << cn << '-' << cc << std::endl;
 
     t.add(candidates[cn][cc], cn);
     if (increment) {

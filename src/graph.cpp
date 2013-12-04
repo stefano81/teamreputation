@@ -67,7 +67,7 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
     for(int i = 0; i < 10 && end(tokenizer) != token; ++i, ++token) {
       float val{std::stof(*token)};
       if (0.0 < val) {
-				uo.add_competence(i, val);
+	uo.add_competence(i, val);
       }
     }
 
@@ -301,9 +301,9 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
       continue; // skip groups with less than two members
 
     t.reputation(compute_reputation(t));
-    std::cerr << "reputation for team " << std::endl << t << std::endl;
+    //std::cerr << "reputation for team " << std::endl << t << std::endl;
     if ( maxRep < t.reputation() ) {
-      std::cerr << "new best reputation" << std::endl;
+      //std::cerr << "new best reputation" << std::endl;
       maxRep = t.reputation();
       maxRepTeam = t;
       found = true;
