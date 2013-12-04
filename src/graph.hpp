@@ -5,7 +5,7 @@
 #include <set>
 #include <string>
 #include <utility>
-
+#include <unordered_map>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -18,6 +18,9 @@ typedef boost::property<boost::vertex_name_t, std::string> VertexProperty;
 typedef boost::property<boost::edge_name_t, unsigned, boost::property<boost::edge_weight_t, float> > EdgeProperty;
 typedef boost::adjacency_list<boost::vecS, boost::listS, boost::directedS, VertexProperty, EdgeProperty> Graph;
 typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+
+
+class reputation_cache;
 
 class graph {
 public:
@@ -48,7 +51,12 @@ private:
   Vertex get_vertex(const user &u) const;
   std::set<user> possible_users(const user &suser, const unsigned &search_level) const;
   double my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const;
+  double my_bfs_cached(const Vertex &u, const Vertex &v, const unsigned &comp, reputation_cache &cache) const;
+
   double distance(const unsigned &c1, const unsigned &c2) const;
   double similarity(const unsigned &c1, const unsigned &c2) const;
   bool is_active(const std::string &name) const;
 };
+
+
+

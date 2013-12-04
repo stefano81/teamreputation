@@ -252,12 +252,82 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
   return reputation[destVertex];
 }
 
+
+
+
+class reputation_cache_key {
+  Vertex const *v1;
+  Vertex const *v2;
+  unsigned comp;
+  
+public:
+  reputation_cache_key(const Vertex &vertex1, const Vertex &vertex2, unsigned competence): 
+    v1(&vertex1), v2(&vertex2), comp(competence) {}
+  
+  bool operator==(const reputation_cache_key &other) const {
+    return *v1 == *(other.v1) && *v2 == *(other.v2) && comp == other.comp;
+  }
+  
+  size_t hash_code() const {
+    return std::hash<Vertex>()(*v1) ^ std::hash<Vertex>()(*v2) ^ std::hash<double>()(comp);
+  }
+  
+};
+
+namespace std {
+  template <>
+  struct hash<reputation_cache_key>{
+    size_t operator()(const reputation_cache_key &key ) const {
+      return key.hash_code();
+    }
+  };
+}
+
+
+class reputation_cache {
+  std::unordered_map<reputation_cache_key, double> cache;
+  
+public:
+  bool contains(const reputation_cache_key &k) const {
+    return cache.count(k) > 0;
+  }
+  
+  double get(const reputation_cache_key &k) const {
+    return cache.at(k);
+  }
+  
+  double set(const reputation_cache_key &k, double val) {
+    cache[k] = val;
+  }
+};
+
+
+
+
+
+
+double graph::my_bfs_cached(const Vertex &u, const Vertex &v, const unsigned &comp, reputation_cache &cache) const {
+  std::cerr << "cached bfs ";
+  reputation_cache_key k(u,v,comp);
+  if ( cache.contains(k) ) {
+    std::cerr << "cache hint!" << std::endl;
+    return cache.get(k);
+  }
+  std::cerr << "cache miss :(" << std::endl;
+
+  double rep = my_bfs(u, v, comp);
+  cache.set(k, rep);
+  return rep;
+}
+
+
 double graph::compute_reputation(const team &t) const {
+  
   // get vertexes
   double reputation = 0.0;
   int num = 0;
   auto m = t.get_members();
-  
+  reputation_cache cache;
   for (auto it = begin(m); it != end(m); ++it) {
     for (auto it2 = begin(m); it2 != end(m); ++it2) {
       if (std::get<1>(*it2) != std::get<1>(*it)) {
@@ -265,7 +335,7 @@ double graph::compute_reputation(const team &t) const {
 	auto v = std::get<1>(*it2);
 	double currRep = 0;
 	try {
-	  currRep = my_bfs(get_vertex(u), get_vertex(v), std::get<0>(*it2));
+	  currRep = my_bfs_cached(get_vertex(u), get_vertex(v), std::get<0>(*it2), cache);
 	} catch (int ex) {
 	  //std::cerr << "there is no direct path between u and v" << std::endl;
 	}
