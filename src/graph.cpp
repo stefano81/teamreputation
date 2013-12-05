@@ -180,11 +180,11 @@ double graph::distance(const unsigned &c1, const unsigned &c2) const {
 
 
 class DijkstraQueueElement {
-  Vertex const *vertex;
+  Vertex vertex;
   double distance;
 
  public:
-  DijkstraQueueElement(const Vertex &v, double d): vertex(&v), distance(d) {}
+  DijkstraQueueElement(const Vertex &v, double d): vertex(v), distance(d) {}
   
   // DijkstraQueueElement(const DijkstraQueueElement&& other) {
   //   vertex = other.vertex;
@@ -204,7 +204,7 @@ class DijkstraQueueElement {
   }
   
   const Vertex& getVertex() const{
-    return *vertex;
+    return vertex;
   }
   const double getDistance() const{
     return distance;
@@ -228,17 +228,11 @@ std::string debug(const graph &g, std::priority_queue<DijkstraQueueElement> qc) 
   while (!qc.empty()) {
     auto top = qc.top();
     qc.pop();
-    o << "(" << top.getVertex() << "," << g.get_user(top.getVertex()) << "=" << top.getDistance() << "), ";
+    o << "(" << g.get_user(top.getVertex()) << "=" << top.getDistance() << "), ";
   }
   o << "]";
   return o.str();
 }
-
-
-// std::ostream& operator<<(std::ostream &o, const DijkstraQueueElement &qe ) {
-//   o << "(" << qe.getVertex() << ","<< qe.distance << ")";
-//   return o;
-// }
 
 
 double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const unsigned &comp) const {
@@ -254,7 +248,7 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
   std::priority_queue<DijkstraQueueElement> tovisit;
   
   tovisit.push(DijkstraQueueElement(sourceVertex, 0.0));
-  std::cerr << "starting from " << get_user(sourceVertex) << ", tovisit:" << debug(*this,tovisit) << std::endl;
+  //std::cerr << "starting from " << get_user(sourceVertex) << ", tovisit:" << debug(*this,tovisit) << std::endl;
   
   while ( !tovisit.empty() ) {
     Vertex u = tovisit.top().getVertex();
@@ -265,7 +259,7 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
       continue;
     
     visited.insert(u);
-    std::cerr << " visiting " << get_user(u) << ", tovisit:" << debug(*this,tovisit) << std::endl;
+    //std::cerr << " visiting " << get_user(u) << ", tovisit:" << debug(*this,tovisit) << std::endl;
     
     for (auto e = out_edges(u, this->g); e.first != e.second; ++(e.first)) {
       Vertex nextVertex = target(*e.first, this->g); 
@@ -286,7 +280,7 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
 
 	if ( visited.count(nextVertex) == 0 ) {
 	  tovisit.push( DijkstraQueueElement(nextVertex, distance[nextVertex]) );
-	  std::cerr << "  added " << get_user(nextVertex)<<" -> "<< debug(*this,tovisit) << std::endl;
+	  //std::cerr << "  added " << get_user(nextVertex)<<" -> "<< debug(*this,tovisit) << std::endl;
 	}
       }
     } //for
@@ -294,12 +288,7 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
 
   if ( distance.count(destVertex) == 0 )
     return 0;
-  
-  try {
-    return reputation.at(destVertex);
-  }catch(std::out_of_range) {
-    throw std::runtime_error("missing last reputation");
-  } 
+  get_or_throw(reputation,destVertex,"missing last reputation");
 }
 
 
