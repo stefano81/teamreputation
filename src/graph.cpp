@@ -184,17 +184,20 @@ class DijkstraQueueElement {
   double distance;
 
  public:
-  DijkstraQueueElement(const DijkstraQueueElement&& ) = delete;
-
   DijkstraQueueElement(const Vertex &v, double d): vertex(&v), distance(d) {}
   
-  DijkstraQueueElement(const DijkstraQueueElement &other): vertex(other.vertex), distance(other.distance) {}
+  // DijkstraQueueElement(const DijkstraQueueElement&& other) {
+  //   vertex = other.vertex;
+  //   distance = other.distance;
+  // }
+
+  // DijkstraQueueElement(const DijkstraQueueElement &other): vertex(other.vertex), distance(other.distance) {}
   
-  DijkstraQueueElement& operator=(const DijkstraQueueElement& other){
-    vertex = other.vertex;
-    distance = other.distance;
-    return *this;
-  }
+  // DijkstraQueueElement& operator=(const DijkstraQueueElement& other){
+  //   vertex = other.vertex;
+  //   distance = other.distance;
+  //   return *this;
+  // }
   
   bool operator<(const DijkstraQueueElement& o) const {
     return distance > o.distance;
@@ -225,7 +228,7 @@ std::string debug(const graph &g, std::priority_queue<DijkstraQueueElement> qc) 
   while (!qc.empty()) {
     auto top = qc.top();
     qc.pop();
-    o << "(" << g.get_user(top.getVertex()) << "=" << top.getDistance() << "), ";
+    o << "(" << top.getVertex() << "," << g.get_user(top.getVertex()) << "=" << top.getDistance() << "), ";
   }
   o << "]";
   return o.str();
