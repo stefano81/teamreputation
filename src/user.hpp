@@ -43,4 +43,4 @@ private:
 };
 
 
-
+std::ostream& operator<<(std::ostream &o, const user& u);

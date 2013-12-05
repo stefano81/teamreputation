@@ -35,6 +35,8 @@ public:
   team compute_top_users(const std::map<unsigned, user> &top_users, const std::set<unsigned> &competeces);
   double compute_reputation(const team &t) const;
 
+  user get_user(const Vertex &v) const;
+
 private:
   // private fields
   const unsigned seed = 1234567;
@@ -47,7 +49,6 @@ private:
 
   // private methods
   void load_dot(const std::string &userfile, const std::string &edgefile);
-  user get_user(const Vertex &v) const;
   Vertex get_vertex(const user &u) const;
   std::set<user> possible_users(const user &suser, const unsigned &search_level) const;
   double my_bfs(const Vertex &u, const Vertex &v, const unsigned &comp) const;

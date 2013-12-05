@@ -3,6 +3,12 @@
 #include <iostream>
 #include <sstream>
 
+std::ostream& operator<<(std::ostream &o, const user& u){
+  o << u.get_name();
+  return o;
+}
+
+
 void user::add_competence(const unsigned &name, const float &value) noexcept {
   //  std::cerr << name << "=" << value << std::endl;
   this->competences[name] = value;
