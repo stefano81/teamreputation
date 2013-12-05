@@ -202,6 +202,17 @@ class DijkstraQueueElement {
   }
 };
 
+
+template<typename K, typename V> 
+V& get_or_throw(std::unordered_map<K,V> &map, const K &key, std::string error_message){
+  try {
+    return map.at(key);
+  }
+  catch(std::out_of_range) {
+    throw std::runtime_error(error_message);
+  }
+}
+
 double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const unsigned &comp) const {
   auto reputation_argument = get(boost::edge_name, g);
   auto reputation_value = get(boost::edge_weight, g);
@@ -237,7 +248,7 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
 	continue; // chain of trust
       
       double w = 1 / ((2 + re) * l); // dist_between(u, nextVertex)
-      double alt = distance.at(u) + w;
+      double alt = get_or_throw(distance, u, "error getting current distance") + w;
       // if ( distance.count(nextVertex) == 0 || alt < distance[nextVertex] ) {
       if ( distance.count(nextVertex) == 0 || distance[nextVertex] > alt ) {
 	distance[nextVertex] = alt;
