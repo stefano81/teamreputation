@@ -9,6 +9,8 @@
 
 #include <functional>   // std::bind
 
+#include "exceptions.hpp"
+
 constexpr unsigned taskSkills{5};
 constexpr unsigned skilln{10};
 
@@ -86,9 +88,9 @@ void testUserCentricCSV(graph& g, const unsigned search_level, const unsigned it
 	} catch (const char *msg) {
 	  std::cerr << "user " << suser.get_name() <<" has no competence, skip" << std::endl;
 	  continue;
-	} catch (int v) {
+	} catch (no_user_exception v) {
 	  std::cerr << "skipping iteration " << i << " because no friends" << std::endl;
-	} catch (std::exception e) {
+	} catch (no_team_exception e) {
 	  std::cerr << "skipping iteration " << i << " because no team is possible" << std::endl;
 	}
     // });

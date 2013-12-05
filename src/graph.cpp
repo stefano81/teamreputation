@@ -21,6 +21,8 @@
 
 #include "teamgenerator.hpp"
 
+#include "exceptions.hpp"
+
 graph::graph(const std::string &userfile, const std::string &edgefile, const std::string &type) : random{seed} {
   if (0 == type.compare("dot"))
     this->load_dot(userfile, edgefile);
@@ -109,7 +111,7 @@ void graph::load_dot(const std::string &userfilepath, const std::string &edgefil
       reputation_value[e.first] = ev;
     } else {
       std::cerr << "Error creating edge between " << user_name[u] << " and " << user_name[v] << std::endl;
-      throw "Error creating edge between users";
+      throw graph_exception("Error creating edge between users");
     }
   }
 }
@@ -225,22 +227,23 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
     visited.insert(u);
     
     for (auto e = out_edges(u, this->g); e.first != e.second; ++(e.first)) {
-      Vertex currentVertex = target(*e.first, this->g); 
+      Vertex nextVertex = target(*e.first, this->g); 
 
       double re = reputation_value[*e.first];
-      if ( re < 0 && currentVertex != destVertex )
+      if ( re < 0 && nextVertex != destVertex )
 	continue; // chain of trust
       double l = similarity(comp, reputation_argument[*e.first]);
       if ( l == 0 )
 	continue; // chain of trust
       
-      double w = 1 / ((2 + re) * l); // dist_between(u, currentVertex)
-      double alt = distance[u] + w;
-      if ( distance.count(currentVertex) == 0 || alt < distance[currentVertex] ) {
-	distance[currentVertex] = alt;
-	reputation[currentVertex] = std::min(reputation[u], re * l);
-	if ( visited.count(currentVertex) == 0 ) {
-	  tovisit.push( DijkstraQueueElement(currentVertex, distance[currentVertex]) );
+      double w = 1 / ((2 + re) * l); // dist_between(u, nextVertex)
+      double alt = distance.at(u) + w;
+      // if ( distance.count(nextVertex) == 0 || alt < distance[nextVertex] ) {
+      if ( distance.count(nextVertex) == 0 || distance[nextVertex] > alt ) {
+	distance[nextVertex] = alt;
+	reputation[nextVertex] = std::min(reputation.at(u), re * l);
+	if ( visited.count(nextVertex) == 0 ) {
+	  tovisit.push( DijkstraQueueElement(nextVertex, distance[nextVertex]) );
 	}
       }
     } //for
@@ -249,7 +252,11 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
   if ( distance.count(destVertex) == 0 )
     return 0;
   
-  return reputation[destVertex];
+  try {
+    return reputation.at(destVertex);
+  }catch(std::out_of_range) {
+    throw std::runtime_error("missing last reputation");
+  } 
 }
 
 
@@ -288,15 +295,20 @@ class reputation_cache {
   std::unordered_map<reputation_cache_key, double> cache;
   
 public:
-  bool contains(const reputation_cache_key &k) const {
+  bool contains(const reputation_cache_key &k) const noexcept {
     return cache.count(k) > 0;
   }
   
-  double get(const reputation_cache_key &k) const {
-    return cache.at(k);
+  double get(const reputation_cache_key &k) const  {
+    try{
+      return cache.at(k);
+    }
+    catch (std::out_of_range){
+      throw cache_exception("Trying to access to an uncached item");
+    }
   }
   
-  double set(const reputation_cache_key &k, double val) {
+  double set(const reputation_cache_key &k, double val) noexcept {
     cache[k] = val;
   }
 };
@@ -333,24 +345,21 @@ double graph::compute_reputation(const team &t) const {
 	auto u = std::get<1>(*it);
 	auto v = std::get<1>(*it2);
 	double currRep = 0;
-	try {
-	  currRep = my_bfs_cached(get_vertex(u), get_vertex(v), std::get<0>(*it2), cache);
-	} catch (int ex) {
-	  //std::cerr << "there is no direct path between u and v" << std::endl;
-	}
+	currRep = my_bfs_cached(get_vertex(u), get_vertex(v), std::get<0>(*it2), cache);
 	//std::cerr << "reputation between " << u.get_name() << " and " << v.get_name() << " for " << std::get<0>(*it2) << " = " << currRep << std::endl;
 	reputation += currRep;
+	num ++;
       }
     }
   }
   
-  return reputation/(t.size() * (t.size() - 1));
+  return reputation/num;
 }
 
 team graph::find_team(const user &suser, const unsigned &scomp, const std::set<unsigned> &taskcomp, const unsigned &search_level) const {
   auto users = possible_users(suser, search_level);
 
-  if (0 == users.size()) throw 0;
+  if (0 == users.size()) throw no_user_exception("no users in specified search level");
 
   teamgenerator tg;
 
@@ -383,7 +392,7 @@ team graph::find_team(const user &suser, const unsigned &scomp, const std::set<u
     return maxRepTeam;
   } 
 
-  throw std::exception{};
+  throw no_team_exception{"no team found"};
 }
 
 std::set<user> graph::possible_users(const user &suser, const unsigned &search_level) const {
