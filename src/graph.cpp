@@ -281,7 +281,7 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
 
   if ( distance.count(destVertex) == 0 )
     return 0;
-  get_or_throw(reputation,destVertex,"missing last reputation");
+  return get_or_throw(reputation,destVertex,"missing last reputation");
 }
 
 
