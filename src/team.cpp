@@ -50,4 +50,6 @@ std::ostream& operator<< (std::ostream &os, const team &t) {
     os << " unknown";
 
   os << std::endl;
+
+  return os;
 }

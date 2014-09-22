@@ -186,17 +186,10 @@ class DijkstraQueueElement {
  public:
   DijkstraQueueElement(const Vertex &v, double d): vertex(v), distance(d) {}
   
-  // DijkstraQueueElement(const DijkstraQueueElement&& other) {
-  //   vertex = other.vertex;
-  //   distance = other.distance;
-  // }
-
-  // DijkstraQueueElement(const DijkstraQueueElement &other): vertex(other.vertex), distance(other.distance) {}
-  
   // DijkstraQueueElement& operator=(const DijkstraQueueElement& other){
-  //   vertex = other.vertex;
-  //   distance = other.distance;
-  //   return *this;
+  //     vertex = other.vertex;
+  //     distance = other.distance;
+  //     return *this;
   // }
   
   bool operator<(const DijkstraQueueElement& o) const {
@@ -342,6 +335,8 @@ public:
   
   double set(const reputation_cache_key &k, double val) noexcept {
     cache[k] = val;
+
+    return val;
   }
 };
 
