@@ -204,16 +204,15 @@ class DijkstraQueueElement {
   }
 };
 
-template<typename K, typename V> 
-V& get_or_throw(std::unordered_map<K,V> &map, const K &key, std::string error_message){
-  try {
-    return map.at(key);
-  }
-  catch(std::out_of_range) {
-    throw std::runtime_error(error_message);
-  }
-}
-
+// // template<typename K, typename V> 
+// // V& get_or_throw(std::unordered_map<K,V> &map, const K &key, std::string error_message){
+// //   try {
+// //     return map.at(key);
+// //   }
+// //   catch(std::out_of_range) {
+// //     throw std::runtime_error(error_message);
+// //   }
+// // }
 
 std::string debug(const graph &g, std::priority_queue<DijkstraQueueElement> qc) {
   std::stringstream o;
@@ -252,7 +251,6 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
       continue;
     
     visited.insert(u);
-    //std::cerr << " visiting " << get_user(u) << ", tovisit:" << debug(*this,tovisit) << std::endl;
     
     for (auto e = out_edges(u, this->g); e.first != e.second; ++(e.first)) {
       Vertex nextVertex = target(*e.first, this->g); 
@@ -265,7 +263,8 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
 	continue; // chain of trust
       
       double w = 1 / ((2 + re) * l); // dist_between(u, nextVertex)
-      double alt = get_or_throw(distance, u, "error getting current distance") + w;
+      //double alt = get_or_throw(distance, u, "error getting current distance") + w;
+      double alt = distance.at(u) + w;
       // if ( distance.count(nextVertex) == 0 || alt < distance[nextVertex] ) {
       if ( distance.count(nextVertex) == 0 || distance[nextVertex] > alt ) {
 	distance[nextVertex] = alt;
@@ -281,11 +280,9 @@ double graph::my_bfs(const Vertex &sourceVertex, const Vertex &destVertex, const
 
   if ( distance.count(destVertex) == 0 )
     return 0;
-  return get_or_throw(reputation,destVertex,"missing last reputation");
+
+  return reputation.at(destVertex);
 }
-
-
-
 
 class reputation_cache_key {
   Vertex const *v1;
@@ -321,7 +318,7 @@ class reputation_cache {
   
 public:
   bool contains(const reputation_cache_key &k) const noexcept {
-    return cache.count(k) > 0;
+      return end(cache) != cache.find(k);
   }
   
   double get(const reputation_cache_key &k) const  {
@@ -339,11 +336,6 @@ public:
     return val;
   }
 };
-
-
-
-
-
 
 double graph::my_bfs_cached(const Vertex &u, const Vertex &v, const unsigned &comp, reputation_cache &cache) const {
   // std::cerr << "cached bfs ";
